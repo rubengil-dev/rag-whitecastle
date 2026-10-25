@@ -9,6 +9,10 @@
 - **Decisión:** Gemini (LLM y embeddings), ChromaDB como base vectorial, LangGraph sobre LangChain para el agente, y Jupyter.
 - **Por qué:** lo impone el enunciado.
 
+### ¿Versiones de las dependencias fijas o libres?
+- **Decisión:** fijas (`==`) en `requirements.txt`, solo las librerías que usamos directamente; todo el stack se instaló en la Fase 0.
+- **Por qué:** al profesor se le instala exactamente lo que hemos probado, y las incompatibilidades salen al principio y no a mitad de proyecto.
+
 ## Organización
 
 ### ¿Un solo notebook o notebook con módulos `.py`?

@@ -4,9 +4,9 @@
 - **Se actualiza:** al cerrar cada sesión.
 
 ## Próxima sesión
-1. Fase 0: entorno virtual con Python 3.11.9 y `requirements.txt`. El `.gitignore` ya existe; falta añadirle la carpeta de la base vectorial cuando exista.
-2. Conseguir la API key de Gemini y guardarla en `.env` (paso a paso, ver Matices de `PAUTAS.md`).
-3. Notebook mínimo que carga la key y recibe una respuesta de Gemini.
+1. Fase 1: hablar el plan antes de implementar (cómo pasarle a Gemini las páginas para transcribirlas, dónde se guarda el texto, cómo se trocea).
+2. Transcribir el manual, guardarlo en `data/` y añadir ese archivo y la carpeta de la base vectorial al `.gitignore`.
+3. Indexar en ChromaDB y comprobar con consultas de prueba.
 
 ## Entregas
 Domingo 2026-11-01:
@@ -16,7 +16,7 @@ Domingo 2026-11-01:
 - [ ] (Opcional) URL pública de la app en Streamlit Cloud.
 
 ## Fases
-- [ ] **Fase 0, arranque:** `.gitignore`, entorno y esqueleto mínimo que arranca.
+- [x] **Fase 0, arranque:** `.gitignore`, entorno y esqueleto mínimo que arranca.
 - [ ] **Fase 1, base de conocimiento:** transcribir el manual con Gemini y guardar el texto (fuera de git, como el PDF), limpiarlo, trocearlo, indexarlo en ChromaDB con embeddings de Gemini y comprobar con consultas de prueba que recupera bien.
 - [ ] **Fase 2, agente RAG:** system prompt (lo trae Rubén: rol, tono, limitaciones, qué hacer sin información) y grafo de LangGraph que recupera y genera. Las decisiones del prompt se anotan sobre la marcha, para el README.
 - [ ] **Fase 3, memoria:** el agente recuerda los turnos anteriores, con un ejemplo en el notebook que lo demuestra.
