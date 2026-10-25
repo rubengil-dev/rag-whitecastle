@@ -5,4 +5,5 @@
 
 ## 2026-10-25: arranque del proyecto
 - Creada la documentación de `.claude/` con `/nuevo-proyecto`, el manual movido a `data/` y el repo con `.gitattributes` y `.gitignore`.
-- Commits: `e892a68` (`.gitattributes` y `.gitignore`), `3e21d13` (`.claude/` y `.gitignore` sin `.claude/`).
+- Commits: `e892a68` (`.gitattributes` y `.gitignore`), `3e21d13` (`.claude/` y `.gitignore` sin `.claude/`), `567288b` (nombre del repo, `rag-whitecastle`, y recordatorio de borrar `.claude/`).
+- Repo conectado a GitHub y subido.
