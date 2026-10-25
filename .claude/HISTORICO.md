@@ -3,8 +3,9 @@
 - **No contiene:** cifras, decisiones con su porqué ni el estado actual.
 - **Se actualiza:** al cerrar cada sesión, después del commit del trabajo.
 
-## 2026-10-25: arranque del proyecto y Fase 0
+## 2026-10-25: arranque del proyecto, Fase 0 y casi toda la Fase 1
 - Creada la documentación de `.claude/` con `/nuevo-proyecto`, el manual movido a `data/` y el repo con `.gitattributes` y `.gitignore`.
 - Repo conectado a GitHub y subido.
 - Fase 0: entorno `.venv` con Python 3.11.9, `requirements.txt` con versiones fijas, API key en `.env` y notebook con test de humo de los dos modelos de Gemini.
-- Commits: `e892a68` (`.gitattributes` y `.gitignore`), `3e21d13` (`.claude/` y `.gitignore` sin `.claude/`), `567288b` (nombre del repo, `rag-whitecastle`, y recordatorio de borrar `.claude/`), `b80ee6a` (Fase 0).
+- Fase 1: transcripción del manual escaneado con Gemini página a página, limpieza, troceado por secciones, indexado en ChromaDB y comprobación de la recuperación con 7 preguntas. Falta añadir las preguntas difíciles de Rubén.
+- Commits: `e892a68` (`.gitattributes` y `.gitignore`), `3e21d13` (`.claude/` y `.gitignore` sin `.claude/`), `567288b` (nombre del repo, `rag-whitecastle`, y recordatorio de borrar `.claude/`), `b80ee6a` (Fase 0), `9b0cdda` (transcripción), `9a1b0d9` (limpieza, troceado, ChromaDB y comprobación de la recuperación).
