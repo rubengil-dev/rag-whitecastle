@@ -1,0 +1,8 @@
+# Qué hay en este archivo y cómo usarlo
+- **Contiene:** una entrada por sesión, la más reciente arriba: fecha, qué se hizo en pocas líneas y los hashes de commit. El detalle de cada cambio está en git (`git show <hash>`).
+- **No contiene:** cifras, decisiones con su porqué ni el estado actual.
+- **Se actualiza:** al cerrar cada sesión, después del commit del trabajo.
+
+## 2026-10-25: arranque del proyecto
+- Creada la documentación de `.claude/` con `/nuevo-proyecto` (fuera de git), el manual movido a `data/` y el repo local con `.gitattributes` y `.gitignore`.
+- Commits: `e892a68` (`.gitattributes` y `.gitignore`).

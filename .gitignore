@@ -7,6 +7,5 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Private files (not part of the public repo)
-.claude/
 enunciado.pdf
 data/white_castle.pdf
