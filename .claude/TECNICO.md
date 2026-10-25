@@ -22,9 +22,11 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 - Abrir el notebook: en VS Code, abrir el `.ipynb` → "Select Kernel" → `.venv (Python 3.11.9)`.
 
 ## Estructura
-- `.gitignore`: deja fuera `.env`, `.venv/`, cachés de Python y Jupyter, `enunciado.pdf` y `data/white_castle.pdf`.
+- `.gitignore`: deja fuera `.env`, `.venv/`, cachés de Python y Jupyter, `enunciado.pdf`, `data/white_castle.pdf`, `data/transcript/` y `chroma_db/`.
 - `.claude/`: documentación de trabajo con Claude.
-- `white_castle_rag.ipynb`: el notebook único. Por ahora: título, imports, configuración (rutas y modelos), carga de la key y test de humo de los dos modelos.
+- `white_castle_rag.ipynb`: el notebook único. Por ahora: título, imports, configuración (rutas y modelos), carga de la key, test de humo de los dos modelos y sección 1 (transcripción).
+- `data/transcript/page_NN.md`: la transcripción, un archivo por página (20). No se sube a git.
+- `chroma_db/`: base vectorial local (aún no existe). No se sube a git.
 - `requirements.txt`: dependencias con versión fija.
 - `.env`: la API key. No se sube a git.
 - `enunciado.pdf`: enunciado del proyecto. No se sube a git.
@@ -32,7 +34,9 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 
 ## Datos
 - Manual de White Castle en español, 20 páginas, descargado de BoardGameGeek.
-- PDF escaneado: cada página es una sola imagen, sin capa de texto (`pypdf` no extrae nada).
+- PDF escaneado: cada página es una sola imagen JPEG de 1102×1654, sin capa de texto (`pypdf` no extrae texto, pero sí la imagen con `page.images[0].data`).
+- Transcripción: unos 44.000 caracteres en total. Revisadas a mano las páginas 5, 10 y 15 contra la imagen: el texto es fiel. Las páginas 15 y 19-20 son casi todo imagen o créditos.
 
 ## Limitaciones conocidas
-Ninguna todavía.
+- `gemini-3.5-flash-lite` ignora `temperature` (avisa con un `UserWarning`): no se le pasa.
+- En la transcripción, algunas descripciones de iconos son aproximadas, hay sumas con formato de fórmula (`$10+10+3+1+1$`), las viñetas salen como `[Icono: Flecha roja]` y los niveles de título (`#`, `##`) no son del todo coherentes entre páginas.

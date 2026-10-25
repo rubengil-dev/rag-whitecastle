@@ -9,3 +9,5 @@ __pycache__/
 # Private files (not part of the public repo)
 enunciado.pdf
 data/white_castle.pdf
+data/transcript/
+chroma_db/

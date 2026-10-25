@@ -54,8 +54,28 @@
 ## Datos
 
 ### ¿Cómo se saca el texto del manual escaneado?
-- **Decisión:** Gemini transcribe las 20 páginas (imágenes) una sola vez y el texto se guarda en un archivo, que es lo que se trocea e indexa.
-- **Por qué:** el PDF no tiene texto extraíble; Gemini lee imágenes y así no hace falta instalar OCR. Se transcribe una vez para no gastar cupo en cada ejecución.
+- **Decisión:** Gemini transcribe cada página por separado (su imagen JPEG, sacada con `pypdf`) y cada una se guarda en su archivo Markdown. Las páginas ya transcritas se saltan.
+- **Por qué:** el PDF no tiene texto extraíble y Gemini lee imágenes, así que no hace falta OCR. Página a página porque con el PDF entero el modelo tiende a resumir y se pierde la página de cada trozo; si una falla, solo se repite esa. Se transcribe una vez para no gastar cupo.
+
+### ¿Qué se hace con iconos e ilustraciones?
+- **Decisión:** se describen brevemente entre corchetes los que aportan reglas (`[Icono: 2 monedas]`); los decorativos se ignoran.
+- **Por qué:** en un manual de juego muchas reglas (costes, recompensas) están solo en iconos.
+
+### ¿Cómo se trocea el texto?
+- **Decisión:** primero por títulos de sección, para no partir una regla; las secciones largas se subdividen por tamaño con solapamiento. Cada trozo guarda su página y su sección. Los valores (tamaño, solapamiento, trozos recuperados) se ajustan con pruebas; se parte de 1000 caracteres y 150 de solapamiento.
+- **Por qué:** las reglas del manual van por secciones; la página y la sección permiten saber de dónde sale cada respuesta.
+
+### ¿La base vectorial se recalcula en cada ejecución?
+- **Decisión:** no; se guarda en local y, si ya existe, se carga.
+- **Por qué:** no gastar cupo de embeddings en cada ejecución.
+
+### ¿Cómo se valida la recuperación y las respuestas?
+- **Decisión:** Claude propone 5 preguntas de prueba sacadas del manual y Rubén añade 2-3 difíciles. Las respuestas se contrastan con ChatGPT u otra IA.
+- **Por qué:** ni Rubén ni Claude conocen el juego lo bastante para validarlo de memoria.
+
+### ¿Reranking, búsqueda híbrida o métricas de calidad?
+- **Decisión:** no en la primera versión.
+- **Por qué:** el enunciado no lo pide; solo se plantea si la recuperación sale floja.
 
 ### ¿Se incluye un `.env.example`?
 - **Decisión:** no, de momento; el README explica cómo crear el `.env`.

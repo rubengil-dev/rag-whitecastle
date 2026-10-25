@@ -4,9 +4,9 @@
 - **Se actualiza:** al cerrar cada sesión.
 
 ## Próxima sesión
-1. Fase 1: hablar el plan antes de implementar (cómo pasarle a Gemini las páginas para transcribirlas, dónde se guarda el texto, cómo se trocea).
-2. Transcribir el manual, guardarlo en `data/` y añadir ese archivo y la carpeta de la base vectorial al `.gitignore`.
-3. Indexar en ChromaDB y comprobar con consultas de prueba.
+1. Fase 1, limpieza y troceado de la transcripción (ya hecha): quitar los `$` de fórmulas y el ruido de `[Icono: Flecha roja]`, y trocear por secciones.
+2. Indexar en ChromaDB, en `chroma_db/`.
+3. Consultas de prueba: Claude propone 5 y Rubén añade 2-3 difíciles; ajustar los parámetros del troceado.
 
 ## Entregas
 Domingo 2026-11-01:
@@ -32,7 +32,7 @@ Domingo 2026-11-01:
 
 ### Decisiones abiertas
 **Parámetros del RAG**
-- Tamaño de los trozos, solapamiento y cuántos se recuperan por pregunta: los fija Claude tras pruebas en la Fase 1.
+- Valores finales de tamaño de trozo, solapamiento y trozos recuperados por pregunta: los fija Claude tras las pruebas de la Fase 1.
 
 ### Mejoras futuras
 Nada por ahora.
