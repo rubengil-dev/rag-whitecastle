@@ -4,7 +4,7 @@
 - **Se actualiza:** cuando cambia algo de lo que describe.
 
 ## Repo
-- GitHub: https://github.com/rubengil-dev/rag-evolve (público). Rama principal: `main`.
+- GitHub: https://github.com/rubengil-dev/rag-whitecastle (público). Rama principal: `main`.
 - Ruta local: `C:\Data\1_MisCosas\Evolve\rag`.
 - Saltos de línea LF, fijados en `.gitattributes`.
 

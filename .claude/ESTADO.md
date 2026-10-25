@@ -28,7 +28,7 @@ Domingo 2026-11-01:
 
 ### Tareas
 - Al terminar el proyecto, Rubén borra `enunciado.pdf`.
-- Al terminar el proyecto, borrar `.claude/` del repo.
+- Al terminar el proyecto, recordar a Rubén que borre `.claude/` del repo (lo hace él, no Claude).
 
 ### Decisiones abiertas
 **Parámetros del RAG**
