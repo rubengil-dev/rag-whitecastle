@@ -65,9 +65,17 @@
 - **Decisión:** primero por títulos de sección, para no partir una regla; las secciones largas se subdividen por tamaño con solapamiento. Cada trozo guarda su página y su sección. Los valores (tamaño, solapamiento, trozos recuperados) se ajustan con pruebas; se parte de 1000 caracteres y 150 de solapamiento.
 - **Por qué:** las reglas del manual van por secciones; la página y la sección permiten saber de dónde sale cada respuesta.
 
+### ¿Cada trozo lleva el título de su sección en el texto?
+- **Decisión:** sí; el trozo empieza con la ruta de títulos (`PREPARACIÓN DE LA PARTIDA > PUENTES`), además de llevarla en los metadatos.
+- **Por qué:** el embedding solo ve el texto; un trozo suelto como "Se colocan los puentes…" sin su sección pierde contexto al buscar.
+
+### ¿Cómo se limpia la transcripción?
+- **Decisión:** reglas de expresiones regulares en una tabla (`CLEANING_RULES`): marcas de fórmula, viñetas de flecha, signo de exclamación e ilustraciones decorativas. No se corrigen erratas sueltas.
+- **Por qué:** es el ruido que se repite; corregir erratas a mano no compensa para el RAG.
+
 ### ¿La base vectorial se recalcula en cada ejecución?
-- **Decisión:** no; se guarda en local y, si ya existe, se carga.
-- **Por qué:** no gastar cupo de embeddings en cada ejecución.
+- **Decisión:** no; se guarda en local y, si ya existe, se carga. Para reconstruirla tras cambiar la limpieza o el troceado, se pone `REBUILD_VECTOR_STORE = True` una vez.
+- **Por qué:** no gastar cupo de embeddings en cada ejecución. El interruptor es explícito porque la base no sabe sola si los trozos han cambiado.
 
 ### ¿Cómo se valida la recuperación y las respuestas?
 - **Decisión:** Claude propone 5 preguntas de prueba sacadas del manual y Rubén añade 2-3 difíciles. Las respuestas se contrastan con ChatGPT u otra IA.

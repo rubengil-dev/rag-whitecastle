@@ -4,9 +4,9 @@
 - **Se actualiza:** al cerrar cada sesión.
 
 ## Próxima sesión
-1. Fase 1, limpieza y troceado de la transcripción (ya hecha): quitar los `$` de fórmulas y el ruido de `[Icono: Flecha roja]`, y trocear por secciones.
-2. Indexar en ChromaDB, en `chroma_db/`.
-3. Consultas de prueba: Claude propone 5 y Rubén añade 2-3 difíciles; ajustar los parámetros del troceado.
+1. Fase 1, cerrar la comprobación de la recuperación: Rubén trae 2-3 preguntas difíciles (preparadas con ChatGPT u otra IA) y se añaden a `TEST_QUESTIONS`. Las 7 de Claude ya recuperan bien la sección correcta en primer lugar.
+2. Si alguna falla, ajustar el troceado o `RETRIEVAL_K`; si no, cerrar la Fase 1.
+3. Fase 2: Rubén trae el system prompt.
 
 ## Entregas
 Domingo 2026-11-01:

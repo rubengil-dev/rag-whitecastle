@@ -24,9 +24,9 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 ## Estructura
 - `.gitignore`: deja fuera `.env`, `.venv/`, cachés de Python y Jupyter, `enunciado.pdf`, `data/white_castle.pdf`, `data/transcript/` y `chroma_db/`.
 - `.claude/`: documentación de trabajo con Claude.
-- `white_castle_rag.ipynb`: el notebook único. Por ahora: título, imports, configuración (rutas y modelos), carga de la key, test de humo de los dos modelos y sección 1 (transcripción).
+- `white_castle_rag.ipynb`: el notebook único. Por ahora: título, imports, configuración (rutas y modelos), carga de la key, test de humo de los dos modelos, sección 1 (transcripción) y sección 2 (limpieza y troceado → variable `chunks`: 76 trozos de 118-1087 caracteres, mediana 616, con metadatos `h1`/`h2`/`h3`, `section` y `page`), sección 3 (base vectorial → variable `vector_store`, colección `white_castle_rules` con ids `chunk_000`…) y sección 4 (comprobación de la recuperación con `TEST_QUESTIONS`, `RETRIEVAL_K = 3`).
 - `data/transcript/page_NN.md`: la transcripción, un archivo por página (20). No se sube a git.
-- `chroma_db/`: base vectorial local (aún no existe). No se sube a git.
+- `chroma_db/`: base vectorial local (76 trozos). No se sube a git. Se reconstruye poniendo `REBUILD_VECTOR_STORE = True` una vez, o borrando la carpeta.
 - `requirements.txt`: dependencias con versión fija.
 - `.env`: la API key. No se sube a git.
 - `enunciado.pdf`: enunciado del proyecto. No se sube a git.
@@ -39,4 +39,4 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 
 ## Limitaciones conocidas
 - `gemini-3.5-flash-lite` ignora `temperature` (avisa con un `UserWarning`): no se le pasa.
-- En la transcripción, algunas descripciones de iconos son aproximadas, hay sumas con formato de fórmula (`$10+10+3+1+1$`), las viñetas salen como `[Icono: Flecha roja]` y los niveles de título (`#`, `##`) no son del todo coherentes entre páginas.
+- En la transcripción, algunas descripciones de iconos son aproximadas, hay sumas con formato de fórmula (`$10+10+3+1+1$`), las viñetas salen como `[Icono: Flecha roja]` y los niveles de título (`#`, `##`) no son del todo coherentes entre páginas. La limpieza quita lo repetido; quedan erratas sueltas (p. ej. "si seis 2/3/4 jugadores" en la p. 2) e iconos dentro de algunos títulos de sección.
