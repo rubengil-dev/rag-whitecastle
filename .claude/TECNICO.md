@@ -24,7 +24,19 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 ## Estructura
 - `.gitignore`: deja fuera `.env`, `.venv/`, cachés de Python y Jupyter, `enunciado.pdf`, `data/white_castle.pdf`, `data/transcript/` y `chroma_db/`.
 - `.claude/`: documentación de trabajo con Claude.
-- `white_castle_rag.ipynb`: el notebook único. Por ahora: título, imports, configuración (rutas y modelos), carga de la key, test de humo de los dos modelos, sección 1 (transcripción) y sección 2 (limpieza y troceado → variable `chunks`: 76 trozos de 118-1087 caracteres, mediana 616, con metadatos `h1`/`h2`/`h3`, `section` y `page`), sección 3 (base vectorial → variable `vector_store`, colección `white_castle_rules` con ids `chunk_000`…) y sección 4 (comprobación de la recuperación con `TEST_QUESTIONS`, `RETRIEVAL_K = 3`).
+- `white_castle_rag.ipynb`: el notebook único, con las salidas guardadas. Secciones:
+  - Intro con el mapa del notebook.
+  - 0, setup: imports, rutas y modelos, y carga de la key.
+  - 1, base de conocimiento:
+    - 1.1, transcripción.
+    - 1.2, limpieza y troceado → `chunks`: 76 trozos de 118-1087 caracteres, mediana 616, con metadatos `h1`/`h2`/`h3`, `section` y `page`.
+    - 1.3, base vectorial → `vector_store`, colección `white_castle_rules` con ids `chunk_000`….
+    - 1.4, comprobación de la recuperación: `RETRIEVAL_K = 5` y `TEST_QUESTIONS = DIRECT_QUESTIONS + HARD_QUESTIONS` (7 + 5, con la página esperada), con una tabla y una celda de conclusiones.
+  - 2, agente:
+    - 2.1, `SYSTEM_PROMPT` y la tabla con el porqué de cada regla.
+    - 2.2, `AgentState`, nodos `retrieve` y `generate` → grafo compilado `agent`; modelo de chat en `llm`.
+    - 2.3, `ask()` sobre `TRY_QUESTIONS` (las difíciles de la 1.4, una sin respuesta en el manual y una fuera de tema), con una celda de conclusiones.
+  - 3, memoria, y 4, chat: solo títulos por ahora.
 - `data/transcript/page_NN.md`: la transcripción, un archivo por página (20). No se sube a git.
 - `chroma_db/`: base vectorial local (76 trozos). No se sube a git. Se reconstruye poniendo `REBUILD_VECTOR_STORE = True` una vez, o borrando la carpeta.
 - `requirements.txt`: dependencias con versión fija.
@@ -38,5 +50,7 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 - Transcripción: unos 44.000 caracteres en total. Revisadas a mano las páginas 5, 10 y 15 contra la imagen: el texto es fiel. Las páginas 15 y 19-20 son casi todo imagen o créditos.
 
 ## Limitaciones conocidas
-- `gemini-3.5-flash-lite` ignora `temperature` (avisa con un `UserWarning`): no se le pasa.
+- `gemini-3.5-flash-lite` ignora `temperature` (avisa con un `UserWarning`): no se le pasa. Por eso la misma pregunta puede dar respuestas distintas en cada ejecución.
+- `gemini-3.8-flash` puede devolver `503 UNAVAILABLE` cuando Google lo tiene saturado, y entonces cada llamada tarda minutos en reintentos.
+- `agent.get_graph().draw_mermaid_png()` envía el grafo a mermaid.ink, un servicio externo: no se usa.
 - En la transcripción, algunas descripciones de iconos son aproximadas, hay sumas con formato de fórmula (`$10+10+3+1+1$`), las viñetas salen como `[Icono: Flecha roja]` y los niveles de título (`#`, `##`) no son del todo coherentes entre páginas. La limpieza quita lo repetido; quedan erratas sueltas (p. ej. "si seis 2/3/4 jugadores" en la p. 2) e iconos dentro de algunos títulos de sección.

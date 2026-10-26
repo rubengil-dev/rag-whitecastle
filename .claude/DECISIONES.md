@@ -19,6 +19,10 @@
 - **Decisión:** un solo notebook, más el README.
 - **Por qué:** el entregable es un `.ipynb`; menos piezas que revisar y el profesor lo ejecuta de arriba abajo.
 
+### ¿Cómo se organiza el notebook?
+- **Decisión:** como un relato, no como una batería de pruebas: intro con el mapa de secciones; cada sección empieza con el porqué de lo que hace; cada prueba termina con una celda de conclusiones; lo que falta por construir aparece como título vacío. Cada idea se cuenta una sola vez, donde se descubre, y el resto de sitios remiten a ella. Las preguntas de prueba se definen una sola vez (1.4) y la 2.3 las reutiliza.
+- **Por qué:** lo evalúa el profesor y se enseña en la demo; el porqué de cada decisión es parte de lo evaluado y servirá para el README. Los títulos vacíos dejan ver qué falta.
+
 ## Repo y datos
 
 ### ¿Repo público o privado?
@@ -62,8 +66,12 @@
 - **Por qué:** en un manual de juego muchas reglas (costes, recompensas) están solo en iconos.
 
 ### ¿Cómo se trocea el texto?
-- **Decisión:** primero por títulos de sección, para no partir una regla; las secciones largas se subdividen por tamaño con solapamiento. Cada trozo guarda su página y su sección. Los valores (tamaño, solapamiento, trozos recuperados) se ajustan con pruebas; se parte de 1000 caracteres y 150 de solapamiento.
-- **Por qué:** las reglas del manual van por secciones; la página y la sección permiten saber de dónde sale cada respuesta.
+- **Decisión:** primero por títulos de sección, para no partir una regla; las secciones largas se subdividen en trozos de 1000 caracteres con 150 de solapamiento. Cada trozo guarda su página y su sección.
+- **Por qué:** las reglas del manual van por secciones; la página y la sección permiten saber de dónde sale cada respuesta. Con esos valores, todas las preguntas de prueba encuentran su página, así que no se han tocado.
+
+### ¿Cuántos trozos se recuperan por pregunta?
+- **Decisión:** 5 (`RETRIEVAL_K`).
+- **Por qué:** con 3, la versión larga de la pregunta del dado pierde uno de sus dos trozos clave (el orden de los pasos); con 5 los conserva todas las preguntas, y 5 trozos siguen siendo un contexto pequeño para Gemini.
 
 ### ¿Cada trozo lleva el título de su sección en el texto?
 - **Decisión:** sí; el trozo empieza con la ruta de títulos (`PREPARACIÓN DE LA PARTIDA > PUENTES`), además de llevarla en los metadatos.
@@ -78,8 +86,8 @@
 - **Por qué:** no gastar cupo de embeddings en cada ejecución. El interruptor es explícito porque la base no sabe sola si los trozos han cambiado.
 
 ### ¿Cómo se valida la recuperación y las respuestas?
-- **Decisión:** Claude propone 5 preguntas de prueba sacadas del manual y Rubén añade 2-3 difíciles. Las respuestas se contrastan con ChatGPT u otra IA.
-- **Por qué:** ni Rubén ni Claude conocen el juego lo bastante para validarlo de memoria.
+- **Decisión:** 7 preguntas directas de Claude y 3 difíciles de Rubén, más versiones largas de dos de ellas. La recuperación se da por buena si sale un trozo de la página esperada entre los recuperados. Las respuestas se contrastan con las soluciones de Rubén (preparadas con ChatGPT u otra IA) y con el texto del manual.
+- **Por qué:** ni Rubén ni Claude conocen el juego lo bastante para validarlo de memoria. Las soluciones de otra IA también son deducciones, así que, si chocan con la respuesta del agente, manda lo que diga el manual.
 
 ### ¿Reranking, búsqueda híbrida o métricas de calidad?
 - **Decisión:** no en la primera versión.
@@ -89,8 +97,34 @@
 - **Decisión:** no, de momento; el README explica cómo crear el `.env`.
 - **Por qué:** decisión mía; se revisa según lo que diga el profesor.
 
+## Agente
+
+### ¿Cómo es el system prompt?
+- **Decisión:** el contenido lo define Rubén y Claude lo ordena. Está escrito en inglés y responde siempre en español. Solo responde con los trozos recuperados. Primero decide el tipo de pregunta (regla con respuesta, regla sin respuesta, aprender a jugar, fuera de tema) y aplica el formato de ese tipo. Si no encuentra la regla, empieza con "No encuentro esta regla en el manual" y propone una regla de la casa, sin citar página. Fuera de tema, responde con una frase fija. El porqué de cada regla está en la tabla de la sección 2.1 del notebook.
+- **Por qué:** los modelos siguen mejor las instrucciones en inglés, pero la demo es en español. El agente no puede distinguir un hueco del manual de una búsqueda fallida, así que la frase vale para los dos casos. El orden por tipos y la frase fija salieron de las pruebas: sin ellos, el modelo citaba páginas donde no tocaba.
+
+### ¿Cómo es el grafo?
+- **Decisión:** `START → retrieve → generate → END`. El estado lleva la conversación (`messages`) y los trozos recuperados. Cada trozo llega a Gemini con la cabecera `[Página N]`. `ask()` muestra la respuesta y debajo las páginas de los trozos recuperados.
+- **Por qué:** el estado con la conversación sirve de base para la memoria de la Fase 3. La cabecera permite citar la página. Ver las páginas recuperadas hace visible el RAG en la demo y ayuda a distinguir un fallo de búsqueda de uno de razonamiento.
+
+### ¿Se dibuja el grafo con LangGraph?
+- **Decisión:** no; el esquema se escribe a mano en una celda Markdown.
+- **Por qué:** LangGraph lo dibuja enviando el grafo a un servicio web externo (mermaid.ink); para tres nodos en línea no compensa depender de él.
+
+### ¿Se corrigen con el prompt los fallos de razonamiento?
+- **Decisión:** no; se documentan en las conclusiones de la sección 2.3 y en la Fase 4 se prueba un modelo mayor.
+- **Por qué:** los fallos vienen de razonar mal con los trozos correctos delante, no de la búsqueda. `gemini-3.5-flash-lite` cambia de respuesta entre ejecuciones, así que ajustar el prompt a una pregunta concreta no garantiza nada.
+
+### ¿Bucle de reintentos que vuelva a buscar si no puede responder?
+- **Decisión:** no por ahora; queda en "Mejoras futuras" de `ESTADO.md`.
+- **Por qué:** en los fallos vistos, los trozos correctos ya estaban recuperados, así que no los arreglaría. Además, tras 3 vueltas solo se habría leído una parte pequeña del manual (no permite afirmar "no viene, seguro"), el juez sería el mismo modelo poco fiable y cada pregunta pasaría a gastar de 2 a 4 llamadas.
+
 ## Método
 
 ### ¿Quién fija los parámetros del RAG y la librería para leer el PDF?
 - **Decisión:** Claude, con pruebas que lo justifiquen (tamaño de trozo, solapamiento, número de trozos recuperados).
 - **Por qué:** lo delego; prefiero decidir con resultados delante.
+
+### ¿Cómo se escriben las conclusiones de las pruebas del agente?
+- **Decisión:** a partir de las salidas guardadas en el notebook. Si se vuelve a ejecutar una sección con respuestas del modelo, sus conclusiones se revisan.
+- **Por qué:** el modelo de chat da respuestas distintas en cada ejecución, y las conclusiones tienen que cuadrar con lo que se ve.
