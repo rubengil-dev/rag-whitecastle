@@ -3,6 +3,13 @@
 - **No contiene:** cifras, decisiones con su porqué ni el estado actual.
 - **Se actualiza:** al cerrar cada sesión, después del commit del trabajo.
 
+## 2026-10-27: Fase 3, memoria
+- Memoria por conversación con `InMemorySaver` y el nodo `rewrite` antes de buscar: clasifica cada pregunta como del mismo tema (la reescribe si hace falta, con las palabras del manual) o de tema nuevo (la deja igual y avisa a `generate`).
+- Probada con tres conversaciones de 5 turnos (preguntas claras, de seguimiento y con cambios de tema), más una conversación nueva y el modo tutorial, y contrastada con el manual: la memoria aguanta y quedan dos fallos aceptados.
+- Limitador de llamadas en el modelo de chat: el plan gratuito corta a 15 por minuto.
+- Trabajo en la rama `phase-3-memory`, fusionada a `main`.
+- Commits: `49ad851` (Fase 3), `dd96010` (`.claude/`).
+
 ## 2026-10-26: cierre de la Fase 1, notebook como relato y Fase 2
 - Fase 1 cerrada: preguntas difíciles de Rubén añadidas a la comprobación de la recuperación y `RETRIEVAL_K` fijado en 5.
 - Notebook reestructurado como relato: intro con mapa, porqué de cada paso, conclusiones tras cada prueba y títulos vacíos para lo pendiente. Fuera el test de humo.
