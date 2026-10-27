@@ -119,6 +119,32 @@
 - **Decisión:** no por ahora; queda en "Mejoras futuras" de `ESTADO.md`.
 - **Por qué:** en los fallos vistos, los trozos correctos ya estaban recuperados, así que no los arreglaría. Además, tras 3 vueltas solo se habría leído una parte pequeña del manual (no permite afirmar "no viene, seguro"), el juez sería el mismo modelo poco fiable y cada pregunta pasaría a gastar de 2 a 4 llamadas.
 
+## Memoria
+
+### ¿Dónde se guarda la conversación?
+- **Decisión:** en memoria, con el checkpointer `InMemorySaver` de LangGraph, una conversación por `thread_id`. Se pierde al reiniciar el kernel.
+- **Por qué:** la demo y la corrección van en una sola ejecución del notebook. Guardarla en un archivo (SQLite) añadiría una dependencia que nadie necesita.
+
+### ¿Cómo se buscan las preguntas de seguimiento?
+- **Decisión:** un nodo `rewrite` antes de `retrieve`. Desde el segundo turno, Gemini clasifica la pregunta en `same_topic` (se reescribe para que se entienda sola, o se deja igual si ya se entiende) o `new_topic` (se deja igual). La respuesta llega como un diccionario estructurado (tipo y pregunta). La pregunta reescrita solo se usa para buscar; `generate` responde a las palabras del jugador. En el primer turno no se llama a Gemini.
+- **Por qué:** una pregunta como "¿y si somos dos?" no encuentra nada en la base. Solo reescribir arrastraba el tema anterior a preguntas claras. Con tres tipos (seguimiento, mismo tema clara y tema nuevo), confundía los dos primeros y buscaba "las dos cosas" tal cual. Con dos, si duda, como mucho reescribe de más, que no hace daño.
+
+### ¿Qué se hace cuando el jugador cambia de tema?
+- **Decisión:** la pregunta se busca tal cual y a `generate` le llega una nota ("the player has changed topic") delante de la pregunta. No se le pasa un resumen de lo anterior.
+- **Por qué:** idea de Rubén, con un ajuste de Claude: la nota va a `generate` y no a la búsqueda, porque las palabras del tema anterior en la pregunta buscada traerían trozos de ese tema. El resumen sobra porque `generate` ya ve toda la conversación.
+
+### ¿Con qué palabras se reescribe?
+- **Decisión:** con las que usó el asistente en la conversación, que vienen del manual, en vez de las informales del jugador ("la sala del Daimio", no "arriba del todo"). Los pasos del modo tutorial se nombran por su contenido, no por su número.
+- **Por qué:** en las pruebas, con las palabras del jugador o con "el segundo paso", la búsqueda no encontraba la página buena.
+
+### ¿Se arreglan los fallos que quedan en las pruebas de memoria?
+- **Decisión:** no. Se aceptan como limitaciones conocidas y quedan documentados en las conclusiones de la 3.3: la reescritura inestable (en cada ejecución falla una pregunta de seguimiento distinta) y la excepción de los jardineros en la última ronda, que está en un trozo que no se recupera.
+- **Por qué:** decisión de Rubén. Acertar unas 4 de cada 5 es suficiente para un modelo tan pequeño y un proyecto de este tamaño, y un jugador que recibe una respuesta floja vuelve a preguntar con más contexto. Si `gemini-3.8-flash` los arregla en la Fase 4, mejor, pero no se busca a propósito.
+
+### ¿Cómo se respeta el límite de llamadas del plan gratuito?
+- **Decisión:** el modelo de chat espacia sus llamadas con `InMemoryRateLimiter` a `CHAT_REQUESTS_PER_SECOND = 0.2` (12 por minuto).
+- **Por qué:** el plan gratuito de `gemini-3.5-flash-lite` permite 15 llamadas por minuto, y el notebook entero hace más de 30 seguidas: sin el limitador, la ejecución se cortaba con un error 429.
+
 ## Método
 
 ### ¿Quién fija los parámetros del RAG y la librería para leer el PDF?
