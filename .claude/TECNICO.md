@@ -41,7 +41,7 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
     - 2.3, `AgentState` (`messages`, `question_kind`, `search_query`, `chunks`), `Rewrite` (salida estructurada del reescritor, en `rewriter`), nodos `rewrite`, `retrieve` y `generate` → grafo `agent` con `InMemorySaver`; `chat(question, thread_id)` muestra la respuesta, cómo se buscó y las páginas.
   - 3, ejemplos y chat:
     - 3.1, `EXAMPLE_CONVERSATIONS`: hilo `examples` (6 turnos, uno por tipo de pregunta, con un seguimiento que demuestra la memoria) y `new_conversation` (el mismo seguimiento sin conversación), con una celda de conclusiones.
-    - 3.2, `chat_loop()`: chat con `input()`, un hilo `chat_N` por conversación (`nueva` / `salir`). Última celda del notebook.
+    - 3.2, las preguntas del chat en directo de la demo (para copiar y pegar) y `chat_loop()`: chat con `input()`, un hilo `chat_N` por conversación (`nueva` / `salir`). Última celda del notebook.
 - `data/transcript/page_NN.md`: la transcripción, un archivo por página (20). No se sube a git.
 - `chroma_db/`: base vectorial local (76 trozos). No se sube a git. Se reconstruye poniendo `REBUILD_VECTOR_STORE = True` una vez, o borrando la carpeta.
 - `requirements.txt`: dependencias con versión fija.

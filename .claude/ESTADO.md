@@ -4,8 +4,8 @@
 - **Se actualiza:** al cerrar cada sesión.
 
 ## Próxima sesión
-1. Entrega: Rubén envía el PDF del manual al profesor y prepara la presentación con `guion_demo.md`.
-2. Si sobra tiempo antes del domingo, Fase 6 (Streamlit): hablarla antes de tocar nada.
+1. Fase 6 (Streamlit): un front para hacer en Streamlit las preguntas del chat en directo de la demo, en vez de en la celda del notebook, que se ve peor. Hablarla antes de tocar nada.
+2. Entrega: Rubén envía el PDF del manual al profesor y prepara la presentación con `guion_demo.md`. Si se hace la Fase 6, la parte del chat en directo del guion cambia.
 
 ## Entregas
 Domingo 2026-11-01:
@@ -37,4 +37,4 @@ Ninguna.
 - Mismo tema o tema nuevo: la clasificación falla a menudo, aunque no hace daño (ver `DECISIONES.md`). Solo se toca si empieza a hacerlo.
 
 ### Pendiente de probar yo
-- La celda del chat (4.2) en VS Code: que salga la caja de `input()`, que las respuestas se lean bien y que funcionen `nueva` y `salir`.
+- La celda del chat (3.2) en VS Code: que salga la caja de `input()`, que las respuestas se lean bien y que funcionen `nueva` y `salir`.
