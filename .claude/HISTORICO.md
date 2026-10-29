@@ -3,6 +3,14 @@
 - **No contiene:** cifras, decisiones con su porqué ni el estado actual.
 - **Se actualiza:** al cerrar cada sesión, después del commit del trabajo.
 
+## 2026-10-29: Revisión del notebook contra el enunciado
+- Quitadas las pruebas de desarrollo (2.3 y 3.3) y el agente sin memoria: queda un solo grafo con memoria y el modelo de chat se crea una vez en el setup. Lo que enseñaron las pruebas se cuenta junto a cada decisión.
+- Ejemplos nuevos en la 3.1: el seguimiento "¿Y cuántos puntos da?" demuestra la memoria, y la misma pregunta en una conversación nueva pide aclaración. Para que funcione: "puntos de clan" en el prompt de reescritura y una nota con la pregunta reescrita para `generate`.
+- Porqué del system prompt en dos puntos en vez de una tabla, y celdas de texto solo con decisiones y contexto, sin explicar conceptos.
+- Guion de la demo reescrito como texto hablado por secciones; preguntas del chat en directo probadas y añadidas a la 3.2.
+- Trabajo en la rama `notebook-cleanup`, fusionada a `main`; el último commit, directo en `main`.
+- Commits: `4289ebb` (limpieza del notebook), `b4c3fb8` (system prompt), `63bf080` (textos y preguntas del chat).
+
 ## 2026-10-28: Fases 4 y 5, chat, pruebas y entrega
 - Probado `gemini-3.8-flash` en las preguntas que fallan: solo 20 llamadas al día gratis y errores `503`. Se queda `gemini-3.5-flash-lite`.
 - System prompt ajustado: tipo nuevo para preguntas que no se entienden solas (solo en el primer turno), "Sí/No" solo en preguntas de sí o no y tutorial que espera a la confirmación. La primera versión pedía aclaración de más y se corrigió.
