@@ -41,6 +41,10 @@
 - **Decisión:** no; va en `.gitignore`.
 - **Por qué:** decisión mía; es material de trabajo, no parte de la entrega (por confirmar).
 
+### ¿Se sube el guion de la demo?
+- **Decisión:** no; `guion_demo.md` va en `.gitignore` (por confirmar).
+- **Por qué:** es material de Rubén para la presentación, no parte de la entrega.
+
 ### ¿Se sube `.claude/`?
 - **Decisión:** sí, mientras dure el proyecto; al acabar se borra del repo.
 - **Por qué:** así se ven en el editor los cambios desde el último commit y `HISTORICO.md` se puede commitear.
@@ -51,9 +55,13 @@
 - **Decisión:** `gemini-3.5-flash-lite` para el chat y `gemini-embedding-2` para los embeddings, ambos gratuitos.
 - **Por qué:** coste cero; Flash-Lite tiene bastante más cupo diario gratuito que Flash y le sobra calidad para las reglas de un juego.
 
+### ¿Se usa un modelo mayor para la demo?
+- **Decisión:** no; la demo usa `gemini-3.5-flash-lite`.
+- **Por qué:** en la Fase 4 se probó `gemini-3.8-flash` con las preguntas que fallan. Su plan gratuito permite solo 20 llamadas al día (cada turno gasta dos) y sus primeras llamadas dieron `503`. La única respuesta que dio era correcta, pero Flash-Lite, con el prompt ajustado, también acierta esa pregunta casi siempre.
+
 ### ¿Cómo se fija el modelo en el código?
 - **Decisión:** en una variable de la celda de configuración, no repetido por el notebook.
-- **Por qué:** se puede cambiar en un sitio, por ejemplo a `gemini-3.8-flash` para la demo si el cupo lo permite.
+- **Por qué:** se puede cambiar en un sitio.
 
 ## Datos
 
@@ -100,8 +108,15 @@
 ## Agente
 
 ### ¿Cómo es el system prompt?
-- **Decisión:** el contenido lo define Rubén y Claude lo ordena. Está escrito en inglés y responde siempre en español. Solo responde con los trozos recuperados. Primero decide el tipo de pregunta (regla con respuesta, regla sin respuesta, aprender a jugar, fuera de tema) y aplica el formato de ese tipo. Si no encuentra la regla, empieza con "No encuentro esta regla en el manual" y propone una regla de la casa, sin citar página. Fuera de tema, responde con una frase fija. El porqué de cada regla está en la tabla de la sección 2.1 del notebook.
+- **Decisión:** el contenido lo define Rubén y Claude lo ordena. Está escrito en inglés y responde siempre en español. Solo responde con los trozos recuperados. Primero decide el tipo de pregunta (regla con respuesta, pregunta que no se entiende sola, regla sin respuesta, aprender a jugar, fuera de tema) y aplica el formato de ese tipo. Si no encuentra la regla, empieza con "No encuentro esta regla en el manual" y propone una regla de la casa, sin citar página. Fuera de tema, responde con una frase fija. El porqué de cada regla está en la tabla de la sección 2.1 del notebook y en el README.
 - **Por qué:** los modelos siguen mejor las instrucciones en inglés, pero la demo es en español. El agente no puede distinguir un hueco del manual de una búsqueda fallida, así que la frase vale para los dos casos. El orden por tipos y la frase fija salieron de las pruebas: sin ellos, el modelo citaba páginas donde no tocaba.
+
+### ¿Cómo se ajustó el prompt en la Fase 4?
+- **Decisión:** tres cambios:
+    - El tipo "pregunta que no se entiende sola" pide al jugador que concrete, solo en el primer turno de una conversación (idea de Rubén).
+    - "Sí" o "No" solo en preguntas de sí o no, nombrando las palabras de pregunta ("qué", "cuánto"…) que nunca empiezan así; las tres partes de la respuesta no se numeran.
+    - La primera respuesta del tutorial es solo la lista de pasos.
+- **Por qué:** sin el primer cambio, el agente se inventaba a qué se refería "lo"; sin limitarlo al primer turno, pedía aclaración incluso cuando la conversación lo dejaba claro. Una regla general sobre "Sí" no bastaba. Sin el tercer cambio, el tutorial explicaba el primer paso sin esperar.
 
 ### ¿Cómo es el grafo?
 - **Decisión:** `START → retrieve → generate → END`. El estado lleva la conversación (`messages`) y los trozos recuperados. Cada trozo llega a Gemini con la cabecera `[Página N]`. `ask()` muestra la respuesta y debajo las páginas de los trozos recuperados.
@@ -112,12 +127,20 @@
 - **Por qué:** LangGraph lo dibuja enviando el grafo a un servicio web externo (mermaid.ink); para tres nodos en línea no compensa depender de él.
 
 ### ¿Se corrigen con el prompt los fallos de razonamiento?
-- **Decisión:** no; se documentan en las conclusiones de la sección 2.3 y en la Fase 4 se prueba un modelo mayor.
+- **Decisión:** no; se documentan en las conclusiones de las secciones 2.3, 3.3 y 4.1. El modelo mayor se probó en la Fase 4 y se descartó (ver "Modelos").
 - **Por qué:** los fallos vienen de razonar mal con los trozos correctos delante, no de la búsqueda. `gemini-3.5-flash-lite` cambia de respuesta entre ejecuciones, así que ajustar el prompt a una pregunta concreta no garantiza nada.
 
 ### ¿Bucle de reintentos que vuelva a buscar si no puede responder?
 - **Decisión:** no por ahora; queda en "Mejoras futuras" de `ESTADO.md`.
 - **Por qué:** en los fallos vistos, los trozos correctos ya estaban recuperados, así que no los arreglaría. Además, tras 3 vueltas solo se habría leído una parte pequeña del manual (no permite afirmar "no viene, seguro"), el juez sería el mismo modelo poco fiable y cada pregunta pasaría a gastar de 2 a 4 llamadas.
+
+### ¿Cómo son la celda de chat y los ejemplos?
+- **Decisión:** la 4.1 es una sola conversación de 6 turnos, uno por cada tipo de pregunta del system prompt, y sus dos primeros demuestran la memoria. La 4.2 es un bucle con `input()` que usa `chat()`: `nueva` empieza otra conversación y `salir` o una línea vacía terminan. Es la última celda del notebook.
+- **Por qué:** una conversación cubre a la vez los 5 ejemplos y la memoria que pide el enunciado, y sirve de guion. El chat va al final para que "Run All" no se quede esperando a mitad.
+
+### ¿Qué se hace si un ejemplo documentado sale mal?
+- **Decisión:** se deja como salió y se explica en sus conclusiones, sin repetir la ejecución hasta que salga bien.
+- **Por qué:** decisión de Rubén. Es honesto, y en la demo sirve para explicar la variabilidad del modelo y que el fallo es de razonamiento, no de búsqueda.
 
 ## Memoria
 
@@ -142,7 +165,7 @@
 - **Por qué:** decisión de Rubén. Acertar unas 4 de cada 5 es suficiente para un modelo tan pequeño y un proyecto de este tamaño, y un jugador que recibe una respuesta floja vuelve a preguntar con más contexto. Si `gemini-3.8-flash` los arregla en la Fase 4, mejor, pero no se busca a propósito.
 
 ### ¿Cómo se respeta el límite de llamadas del plan gratuito?
-- **Decisión:** el modelo de chat espacia sus llamadas con `InMemoryRateLimiter` a `CHAT_REQUESTS_PER_SECOND = 0.2` (12 por minuto).
+- **Decisión:** el modelo de chat y el de la transcripción espacian sus llamadas con `InMemoryRateLimiter` a `CHAT_REQUESTS_PER_SECOND = 0.2` (12 por minuto).
 - **Por qué:** el plan gratuito de `gemini-3.5-flash-lite` permite 15 llamadas por minuto, y el notebook entero hace más de 30 seguidas: sin el limitador, la ejecución se cortaba con un error 429.
 
 ## Método
