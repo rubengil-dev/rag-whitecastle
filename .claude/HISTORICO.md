@@ -3,6 +3,14 @@
 - **No contiene:** cifras, decisiones con su porqué ni el estado actual.
 - **Se actualiza:** al cerrar cada sesión, después del commit del trabajo.
 
+## 2026-10-28: Fases 4 y 5, chat, pruebas y entrega
+- Probado `gemini-3.8-flash` en las preguntas que fallan: solo 20 llamadas al día gratis y errores `503`. Se queda `gemini-3.5-flash-lite`.
+- System prompt ajustado: tipo nuevo para preguntas que no se entienden solas (solo en el primer turno), "Sí/No" solo en preguntas de sí o no y tutorial que espera a la confirmación. La primera versión pedía aclaración de más y se corrigió.
+- Sección 4: conversación de ejemplo de 6 turnos, uno por tipo de pregunta, y celda de chat con `input()`. Un ejemplo que salió mal se deja documentado (decisión de Rubén).
+- Fase 5: notebook re-ejecutado entero con conclusiones nuevas en 2.3, 3.3 y 4.1, limitador también en la transcripción, prueba desde cero en una carpeta limpia, README completo y guion de la demo fuera de git.
+- Trabajo en la rama `phase-4-chat`, fusionada a `main`.
+- Commits: `ec5c037` (Fases 4-5), `25b8db8` (`.claude/`).
+
 ## 2026-10-27: Fase 3, memoria
 - Memoria por conversación con `InMemorySaver` y el nodo `rewrite` antes de buscar: clasifica cada pregunta como del mismo tema (la reescribe si hace falta, con las palabras del manual) o de tema nuevo (la deja igual y avisa a `generate`).
 - Probada con tres conversaciones de 5 turnos (preguntas claras, de seguimiento y con cambios de tema), más una conversación nueva y el modo tutorial, y contrastada con el manual: la memoria aguanta y quedan dos fallos aceptados.
