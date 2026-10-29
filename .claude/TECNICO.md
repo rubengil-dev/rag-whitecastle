@@ -20,7 +20,7 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 - Crear el entorno virtual (una sola vez): `py -3.11 -m venv .venv`
 - Instalar las dependencias: `.\.venv\Scripts\python -m pip install -r requirements.txt`
 - Abrir el notebook: en VS Code, abrir el `.ipynb` → "Select Kernel" → `.venv (Python 3.11.9)`.
-- Claude ejecuta el notebook con `nbclient` desde un entorno aparte, en su carpeta temporal, con un kernelspec propio que apunta al `python` del `.venv`. `nbclient` no está en `requirements.txt`. Se salta siempre la celda del chat (4.2), que esperaría un `input()`; los bucles de la 2.3 y la 3.3 se saltan si no hay que regenerar sus salidas, y entonces conservan las guardadas.
+- Claude ejecuta el notebook con `nbclient` desde un entorno aparte, en su carpeta temporal, con un kernelspec propio que apunta al `python` del `.venv`. `nbclient` no está en `requirements.txt`. Se salta siempre la celda del chat (3.2), que esperaría un `input()`.
 
 ## Estructura
 - `.gitignore`: deja fuera `.env`, `.venv/`, cachés de Python y Jupyter, `enunciado.pdf`, `data/white_castle.pdf`, `data/transcript/`, `chroma_db/` y `guion_demo.md`.
@@ -29,23 +29,19 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 - `.claude/`: documentación de trabajo con Claude.
 - `white_castle_rag.ipynb`: el notebook único, con las salidas guardadas. Secciones:
   - Intro con el mapa del notebook.
-  - 0, setup: imports, rutas y modelos, y carga de la key.
+  - 0, setup: imports, rutas y modelos, carga de la key y modelo de chat `llm` con su limitador, compartido por la transcripción y el agente.
   - 1, base de conocimiento:
     - 1.1, transcripción.
     - 1.2, limpieza y troceado → `chunks`: 76 trozos de 118-1087 caracteres, mediana 616, con metadatos `h1`/`h2`/`h3`, `section` y `page`.
     - 1.3, base vectorial → `vector_store`, colección `white_castle_rules` con ids `chunk_000`….
     - 1.4, comprobación de la recuperación: `RETRIEVAL_K = 5` y `TEST_QUESTIONS = DIRECT_QUESTIONS + HARD_QUESTIONS` (7 + 5, con la página esperada), con una tabla y una celda de conclusiones.
-  - 2, agente:
+  - 2, agente con memoria:
     - 2.1, `SYSTEM_PROMPT` y la tabla con el porqué de cada regla.
-    - 2.2, `AgentState`, nodos `retrieve` y `generate` → grafo compilado `agent`; modelo de chat en `llm`.
-    - 2.3, `ask()` sobre `TRY_QUESTIONS` (las difíciles de la 1.4, una sin respuesta en el manual y una fuera de tema), con una celda de conclusiones.
-  - 3, memoria:
-    - 3.1, `REWRITE_PROMPT` y `TOPIC_CHANGE_NOTE`.
-    - 3.2, `MemoryState` (añade `question_kind` y `search_query`), `Rewrite` (salida estructurada del reescritor, en `rewriter`), nodos `rewrite`, `retrieve_search_query` y `generate_in_conversation` → grafo `memory_agent` con `InMemorySaver`; `chat(question, thread_id)` muestra la respuesta, cómo se buscó y las páginas.
-    - 3.3, `MEMORY_CONVERSATIONS`: `dice`, `courtiers` y `topic_changes` (5 turnos cada una), `new_thread` y `tutorial`, con una celda de conclusiones.
-  - 4, chat:
-    - 4.1, `EXAMPLE_CONVERSATION`: 6 turnos en el hilo `examples`, uno por cada tipo de pregunta, con una celda de conclusiones (incluye por qué no se usa `gemini-3.8-flash`).
-    - 4.2, `chat_loop()`: chat con `input()`, un hilo `chat_N` por conversación (`nueva` / `salir`). Última celda del notebook.
+    - 2.2, memoria: `REWRITE_PROMPT`, `TOPIC_CHANGE_NOTE` y `FOLLOW_UP_NOTE`.
+    - 2.3, `AgentState` (`messages`, `question_kind`, `search_query`, `chunks`), `Rewrite` (salida estructurada del reescritor, en `rewriter`), nodos `rewrite`, `retrieve` y `generate` → grafo `agent` con `InMemorySaver`; `chat(question, thread_id)` muestra la respuesta, cómo se buscó y las páginas.
+  - 3, ejemplos y chat:
+    - 3.1, `EXAMPLE_CONVERSATIONS`: hilo `examples` (6 turnos, uno por tipo de pregunta, con un seguimiento que demuestra la memoria) y `new_conversation` (el mismo seguimiento sin conversación), con una celda de conclusiones.
+    - 3.2, `chat_loop()`: chat con `input()`, un hilo `chat_N` por conversación (`nueva` / `salir`). Última celda del notebook.
 - `data/transcript/page_NN.md`: la transcripción, un archivo por página (20). No se sube a git.
 - `chroma_db/`: base vectorial local (76 trozos). No se sube a git. Se reconstruye poniendo `REBUILD_VECTOR_STORE = True` una vez, o borrando la carpeta.
 - `requirements.txt`: dependencias con versión fija.

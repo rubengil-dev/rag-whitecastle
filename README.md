@@ -18,11 +18,12 @@ The rulebook is a **scanned PDF**: every page is a single image, with no text to
 | Text → chunks | 1.2 | The text is cleaned and split by section, then by size (1,000 characters, 150 of overlap). Each chunk keeps its page and section |
 | Chunks → vectors | 1.3 | Gemini embeddings (`gemini-embedding-2`), stored in a local ChromaDB collection |
 | Search check | 1.4 | 12 test questions with known pages: the right page is among the 5 retrieved chunks in all of them |
-| Agent | 2 | LangGraph graph that retrieves the 5 closest chunks and answers with Gemini (`gemini-3.5-flash-lite`) |
-| Memory | 3 | A checkpointer keeps each conversation, and a rewrite step turns follow-ups into standalone questions before searching |
-| Chat | 4 | An example conversation and a chat cell |
+| System prompt | 2.1 | Role, answer format and limits of the agent, with the reason for each rule |
+| Memory | 2.2 | A checkpointer keeps each conversation, and a rewrite step turns follow-ups into standalone questions before searching |
+| Agent | 2.3 | LangGraph graph that rewrites the question, retrieves the 5 closest chunks and answers with Gemini (`gemini-3.5-flash-lite`) |
+| Examples and chat | 3 | Seven documented example questions and a chat cell |
 
-The final graph:
+The graph:
 
 ```
 START → rewrite → retrieve → generate → END
@@ -30,7 +31,7 @@ START → rewrite → retrieve → generate → END
 
 - **rewrite:** from the second turn on, Gemini classifies the question as the same topic (rewritten so it can be understood on its own, with the rulebook's words) or a new topic (searched as it is).
 - **retrieve:** the question to search → the 5 closest chunks of the rulebook.
-- **generate:** system prompt + whole conversation + chunks, each under its page → the answer.
+- **generate:** system prompt + whole conversation + chunks, each under its page → the answer. A short note before the question says when the player changed topic, or what a follow-up means on its own (the rewritten question).
 
 Under every answer, the notebook shows how the question was searched and the pages of the retrieved chunks, so a failed search can be told apart from a failed answer.
 
@@ -70,7 +71,7 @@ Under every answer, the notebook shows how the question was searched and the pag
 Open `white_castle_rag.ipynb`, select the `.venv` kernel and run all the cells, top to bottom.
 
 - **First run:** Gemini transcribes the 20 pages (`data/transcript/`) and the vector store is built (`chroma_db/`). Later runs load both from disk and spend no quota on them.
-- **Time:** the free tier allows 15 calls per minute, so every Gemini call is spaced to 12 per minute (`CHAT_REQUESTS_PER_SECOND`). The whole notebook takes about 15 minutes on the first run. Each transcription is slightly different, so the number of chunks and the answers may differ a little from the saved outputs.
+- **Time:** the free tier allows 15 calls per minute, so every Gemini call is spaced to 12 per minute (`CHAT_REQUESTS_PER_SECOND`). The whole notebook takes about 15 minutes on the first run, mostly the transcription, and about 5 on later runs. Each transcription is slightly different, so the number of chunks and the answers may differ a little from the saved outputs.
 - **Chat:** the last cell opens a text box (in VS Code, at the top of the window) to talk to the agent. `nueva` starts a new conversation with no memory of the earlier one, and `salir` or an empty line ends the chat.
 
 The settings live next to the explanation of their values: models and paths in section 0, chunking in 1.2, number of retrieved chunks in 1.4. To rebuild the vector store after changing the cleaning or the chunking, set `REBUILD_VECTOR_STORE = True` once (section 1.3).
@@ -114,7 +115,7 @@ Never explain all the steps at once.
 Reply only with "Solo puedo ayudarte con las reglas de White Castle.", with no explanation and no page.
 ```
 
-Why each rule is there. Most of them come from a failure seen in the tests of the notebook:
+Why each rule is there. Most of them come from a failure seen in the tests run while building the agent:
 
 | Rule | Why |
 |---|---|
@@ -131,15 +132,13 @@ Why each rule is there. Most of them come from a failure seen in the tests of th
 | One step at a time to learn the game | A whole explanation of the game is a wall of text, and the memory makes the step-by-step possible. The first answer is only the list: otherwise the model explained the first step without waiting |
 | Fixed reply outside White Castle | Keeps the agent in its role. Worded freely, the model still added a page |
 
-A second, smaller prompt (`REWRITE_PROMPT`, section 3.1) prepares follow-up questions for the search. It asks for the rulebook's words used in the conversation instead of the player's informal ones ("la sala del Daimio", not "arriba del todo"), because with the player's words the search missed the right page.
+A second, smaller prompt (`REWRITE_PROMPT`, section 2.2) prepares follow-up questions for the search. It asks for the rulebook's words used in the conversation instead of the player's informal ones ("la sala del Daimio", not "arriba del todo"), and names points by the rulebook's term, "puntos de clan": with the player's words, the search missed the right page.
 
 ## Examples
 
-- **Section 4.1:** one conversation of six turns, one for each kind of question of the system prompt, with memory carrying the first two.
-- **Section 3.3:** five conversations that test the memory: clear questions about one topic, follow-ups that only make sense with the earlier turns, unannounced changes of topic, a follow-up in a new conversation and the step-by-step mode.
-- **Section 2.3:** the harder questions, which need several rules at once.
+Section 3.1 runs two conversations with seven questions that go through the five kinds of question of the system prompt: a direct rule, a follow-up that only makes sense with the turn before (the memory), a rule that has to be deduced, a rule the rulebook does not have, an off-topic question, the "learning to play" mode, and the same follow-up in a new conversation, where the agent asks what it refers to. The cell after them checks the answers against the rulebook.
 
-Each test ends with a cell of conclusions, with the answers checked against the rulebook.
+The agent was tuned with more tests: harder questions that need several rules at once, and five conversations of up to five turns to test the memory. They are not kept in the notebook, to keep it short, but what they showed is explained next to each decision.
 
 ## Technical decisions
 
@@ -152,7 +151,7 @@ Each test ends with a cell of conclusions, with the answers checked against the 
 ## Known limitations
 
 - **Answers vary between runs:** `gemini-3.5-flash-lite` ignores `temperature`, so the same question can be answered right in one run and wrong in the next, mostly in questions that must be deduced from several rules. In the wrong answers seen, the right pages had been retrieved: the error is in the reasoning, not in the search.
-- **The rewrite of follow-ups is not always right:** in each run of the memory tests about one follow-up out of five is rewritten without a key word, and the search then misses its page.
+- **The rewrite of follow-ups is not always right:** in each run of the memory tests, about one follow-up out of five was rewritten without a key word, and the search then missed its page.
 - **A rule split across two chunks:** the exception of the gardeners in the last round is in a chunk that is not retrieved with the question about them.
 - **Free tier:** about 15 calls per minute. The notebook spaces its calls, so it is slow but does not fail.
 

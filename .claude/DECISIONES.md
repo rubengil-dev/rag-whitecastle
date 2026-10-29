@@ -20,8 +20,8 @@
 - **Por qué:** el entregable es un `.ipynb`; menos piezas que revisar y el profesor lo ejecuta de arriba abajo.
 
 ### ¿Cómo se organiza el notebook?
-- **Decisión:** como un relato, no como una batería de pruebas: intro con el mapa de secciones; cada sección empieza con el porqué de lo que hace; cada prueba termina con una celda de conclusiones; lo que falta por construir aparece como título vacío. Cada idea se cuenta una sola vez, donde se descubre, y el resto de sitios remiten a ella. Las preguntas de prueba se definen una sola vez (1.4) y la 2.3 las reutiliza.
-- **Por qué:** lo evalúa el profesor y se enseña en la demo; el porqué de cada decisión es parte de lo evaluado y servirá para el README. Los títulos vacíos dejan ver qué falta.
+- **Decisión:** como un relato, no como una batería de pruebas: intro con el mapa de secciones; cada sección empieza con el porqué de lo que hace; cada prueba termina con una celda de conclusiones. Cada idea se cuenta una sola vez, donde se descubre, y el resto de sitios remiten a ella. Solo se quedan las pruebas que pide el enunciado: la comprobación de la recuperación (1.4) y los ejemplos (3.1). Las pruebas de desarrollo (el agente sin memoria y las conversaciones de memoria) se quitaron, y lo que enseñaron se cuenta junto a cada decisión, diciendo que viene de ellas.
+- **Por qué:** lo evalúa el profesor y se enseña en la demo; el porqué de cada decisión es parte de lo evaluado. Las pruebas de desarrollo repetían preguntas y alargaban la ejecución (unas 50 llamadas a Gemini en vez de unas 13). El porqué se queda en el notebook aunque también esté en el README, porque el notebook es lo que lee el profesor (decisión de Rubén).
 
 ## Repo y datos
 
@@ -60,8 +60,8 @@
 - **Por qué:** en la Fase 4 se probó `gemini-3.8-flash` con las preguntas que fallan. Su plan gratuito permite solo 20 llamadas al día (cada turno gasta dos) y sus primeras llamadas dieron `503`. La única respuesta que dio era correcta, pero Flash-Lite, con el prompt ajustado, también acierta esa pregunta casi siempre.
 
 ### ¿Cómo se fija el modelo en el código?
-- **Decisión:** en una variable de la celda de configuración, no repetido por el notebook.
-- **Por qué:** se puede cambiar en un sitio.
+- **Decisión:** en una variable de la celda de configuración, no repetido por el notebook. El modelo de chat (`llm`) se crea una sola vez en el setup y lo comparten la transcripción y el agente. El porqué del modelo se explica en la sección 0 del notebook y en el README.
+- **Por qué:** se puede cambiar en un sitio, y el limitador de llamadas se explica una sola vez.
 
 ## Datos
 
@@ -119,15 +119,15 @@
 - **Por qué:** sin el primer cambio, el agente se inventaba a qué se refería "lo"; sin limitarlo al primer turno, pedía aclaración incluso cuando la conversación lo dejaba claro. Una regla general sobre "Sí" no bastaba. Sin el tercer cambio, el tutorial explicaba el primer paso sin esperar.
 
 ### ¿Cómo es el grafo?
-- **Decisión:** `START → retrieve → generate → END`. El estado lleva la conversación (`messages`) y los trozos recuperados. Cada trozo llega a Gemini con la cabecera `[Página N]`. `ask()` muestra la respuesta y debajo las páginas de los trozos recuperados.
-- **Por qué:** el estado con la conversación sirve de base para la memoria de la Fase 3. La cabecera permite citar la página. Ver las páginas recuperadas hace visible el RAG en la demo y ayuda a distinguir un fallo de búsqueda de uno de razonamiento.
+- **Decisión:** un solo grafo, `START → rewrite → retrieve → generate → END`, compilado con el checkpointer. El estado lleva la conversación (`messages`), el tipo de pregunta, la pregunta que se busca y los trozos recuperados. Cada trozo llega a Gemini con la cabecera `[Página N]`. `chat()` muestra la respuesta y debajo cómo se buscó y las páginas de los trozos recuperados.
+- **Por qué:** el grafo sin memoria (`retrieve → generate`) solo lo usaban las pruebas de desarrollo; con los dos había cinco parejas de piezas casi iguales. La cabecera permite citar la página. Ver las páginas recuperadas hace visible el RAG en la demo y ayuda a distinguir un fallo de búsqueda de uno de razonamiento.
 
 ### ¿Se dibuja el grafo con LangGraph?
 - **Decisión:** no; el esquema se escribe a mano en una celda Markdown.
 - **Por qué:** LangGraph lo dibuja enviando el grafo a un servicio web externo (mermaid.ink); para tres nodos en línea no compensa depender de él.
 
 ### ¿Se corrigen con el prompt los fallos de razonamiento?
-- **Decisión:** no; se documentan en las conclusiones de las secciones 2.3, 3.3 y 4.1. El modelo mayor se probó en la Fase 4 y se descartó (ver "Modelos").
+- **Decisión:** no; los vistos en las pruebas se resumen en las conclusiones de la 3.1 y en "Known limitations" del README. El modelo mayor se probó en la Fase 4 y se descartó (ver "Modelos").
 - **Por qué:** los fallos vienen de razonar mal con los trozos correctos delante, no de la búsqueda. `gemini-3.5-flash-lite` cambia de respuesta entre ejecuciones, así que ajustar el prompt a una pregunta concreta no garantiza nada.
 
 ### ¿Bucle de reintentos que vuelva a buscar si no puede responder?
@@ -135,12 +135,12 @@
 - **Por qué:** en los fallos vistos, los trozos correctos ya estaban recuperados, así que no los arreglaría. Además, tras 3 vueltas solo se habría leído una parte pequeña del manual (no permite afirmar "no viene, seguro"), el juez sería el mismo modelo poco fiable y cada pregunta pasaría a gastar de 2 a 4 llamadas.
 
 ### ¿Cómo son la celda de chat y los ejemplos?
-- **Decisión:** la 4.1 es una sola conversación de 6 turnos, uno por cada tipo de pregunta del system prompt, y sus dos primeros demuestran la memoria. La 4.2 es un bucle con `input()` que usa `chat()`: `nueva` empieza otra conversación y `salir` o una línea vacía terminan. Es la última celda del notebook.
-- **Por qué:** una conversación cubre a la vez los 5 ejemplos y la memoria que pide el enunciado, y sirve de guion. El chat va al final para que "Run All" no se quede esperando a mitad.
+- **Decisión:** la 3.1 tiene dos conversaciones. `examples` tiene 6 turnos que cubren los tipos de pregunta del system prompt; el segundo, "¿Y cuántos puntos da?", es una pregunta de seguimiento que demuestra la memoria (idea de Rubén: la respuesta depende del piso del que parte el cortesano). `new_conversation` hace esa misma pregunta sin conversación detrás, y el agente pide que concrete. La 3.2 es un bucle con `input()` que usa `chat()`: `nueva` empieza otra conversación y `salir` o una línea vacía terminan. Es la última celda del notebook.
+- **Por qué:** el enunciado pide 5 ejemplos documentados y uno que demuestre la memoria con "una pregunta que hace referencia a una respuesta anterior"; la versión anterior lo demostraba con una respuesta del jugador a una aclaración, no con una pregunta. El chat va al final para que "Run All" no se quede esperando a mitad.
 
 ### ¿Qué se hace si un ejemplo documentado sale mal?
-- **Decisión:** se deja como salió y se explica en sus conclusiones, sin repetir la ejecución hasta que salga bien.
-- **Por qué:** decisión de Rubén. Es honesto, y en la demo sirve para explicar la variabilidad del modelo y que el fallo es de razonamiento, no de búsqueda.
+- **Decisión:** se corrige (decisión de Rubén, que cambia la anterior de dejarlo como saliera). Si el fallo tiene una causa general (por ejemplo, una palabra del jugador que no está en el manual), se arregla esa causa; si es solo la variabilidad del modelo, se vuelve a ejecutar y las conclusiones dicen que esa pregunta varía (por confirmar).
+- **Por qué:** los ejemplos de la 3.1 son lo único que ve el profesor del agente respondiendo; un fallo entre 7 respuestas pesa mucho más que entre las 30 de antes.
 
 ## Memoria
 
@@ -149,19 +149,19 @@
 - **Por qué:** la demo y la corrección van en una sola ejecución del notebook. Guardarla en un archivo (SQLite) añadiría una dependencia que nadie necesita.
 
 ### ¿Cómo se buscan las preguntas de seguimiento?
-- **Decisión:** un nodo `rewrite` antes de `retrieve`. Desde el segundo turno, Gemini clasifica la pregunta en `same_topic` (se reescribe para que se entienda sola, o se deja igual si ya se entiende) o `new_topic` (se deja igual). La respuesta llega como un diccionario estructurado (tipo y pregunta). La pregunta reescrita solo se usa para buscar; `generate` responde a las palabras del jugador. En el primer turno no se llama a Gemini.
-- **Por qué:** una pregunta como "¿y si somos dos?" no encuentra nada en la base. Solo reescribir arrastraba el tema anterior a preguntas claras. Con tres tipos (seguimiento, mismo tema clara y tema nuevo), confundía los dos primeros y buscaba "las dos cosas" tal cual. Con dos, si duda, como mucho reescribe de más, que no hace daño.
+- **Decisión:** un nodo `rewrite` antes de `retrieve`. Desde el segundo turno, Gemini clasifica la pregunta en `same_topic` (se reescribe para que se entienda sola, o se deja igual si ya se entiende) o `new_topic` (se deja igual). La respuesta llega como un diccionario estructurado (tipo y pregunta). La pregunta reescrita se usa para buscar y, si cambió, le llega a `generate` como nota (`FOLLOW_UP_NOTE`: "por sí sola, significa…"); `generate` sigue respondiendo a las palabras del jugador. En el primer turno no se llama a Gemini.
+- **Por qué:** una pregunta como "¿y si somos dos?" no encuentra nada en la base. Solo reescribir arrastraba el tema anterior a preguntas claras. Con tres tipos (seguimiento, mismo tema clara y tema nuevo), confundía los dos primeros y buscaba "las dos cosas" tal cual. Con dos, si duda, como mucho reescribe de más, que no hace daño. La nota se añadió al rehacer los ejemplos: sin ella, "¿Y cuántos puntos da?" tras el coste de subir un cortesano se respondía pidiendo aclaración en 4 de 6 ejecuciones, con la conversación delante; con ella, se respondió en 4 de 4. La pregunta del jugador no se sustituye porque la reescritura a veces pierde un detalle.
 
 ### ¿Qué se hace cuando el jugador cambia de tema?
 - **Decisión:** la pregunta se busca tal cual y a `generate` le llega una nota ("the player has changed topic") delante de la pregunta. No se le pasa un resumen de lo anterior.
 - **Por qué:** idea de Rubén, con un ajuste de Claude: la nota va a `generate` y no a la búsqueda, porque las palabras del tema anterior en la pregunta buscada traerían trozos de ese tema. El resumen sobra porque `generate` ya ve toda la conversación.
 
 ### ¿Con qué palabras se reescribe?
-- **Decisión:** con las que usó el asistente en la conversación, que vienen del manual, en vez de las informales del jugador ("la sala del Daimio", no "arriba del todo"). Los pasos del modo tutorial se nombran por su contenido, no por su número.
-- **Por qué:** en las pruebas, con las palabras del jugador o con "el segundo paso", la búsqueda no encontraba la página buena.
+- **Decisión:** con las que usó el asistente en la conversación, que vienen del manual, en vez de las informales del jugador ("la sala del Daimio", no "arriba del todo"). Los puntos se nombran "puntos de clan", como en el manual. Los pasos del modo tutorial se nombran por su contenido, no por su número.
+- **Por qué:** en las pruebas, con las palabras del jugador o con "el segundo paso", la búsqueda no encontraba la página buena. Con "¿Y cuántos puntos da?" tras el coste de subir un cortesano, la búsqueda con "puntos" traía la acción del cortesano y no la puntuación de la página 14; con "puntos de clan", la página 14 sale la primera.
 
 ### ¿Se arreglan los fallos que quedan en las pruebas de memoria?
-- **Decisión:** no. Se aceptan como limitaciones conocidas y quedan documentados en las conclusiones de la 3.3: la reescritura inestable (en cada ejecución falla una pregunta de seguimiento distinta) y la excepción de los jardineros en la última ronda, que está en un trozo que no se recupera.
+- **Decisión:** no. Se aceptan como limitaciones conocidas y quedan resumidos en las conclusiones de la 3.1 y en el README: la reescritura inestable (en cada ejecución falla una pregunta de seguimiento distinta) y la excepción de los jardineros en la última ronda, que está en un trozo que no se recupera.
 - **Por qué:** decisión de Rubén. Acertar unas 4 de cada 5 es suficiente para un modelo tan pequeño y un proyecto de este tamaño, y un jugador que recibe una respuesta floja vuelve a preguntar con más contexto. Si `gemini-3.8-flash` los arregla en la Fase 4, mejor, pero no se busca a propósito.
 
 ### ¿Cómo se respeta el límite de llamadas del plan gratuito?
