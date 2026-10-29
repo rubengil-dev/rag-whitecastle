@@ -24,7 +24,7 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 
 ## Estructura
 - `.gitignore`: deja fuera `.env`, `.venv/`, cachés de Python y Jupyter, `enunciado.pdf`, `data/white_castle.pdf`, `data/transcript/`, `chroma_db/` y `guion_demo.md`.
-- `README.md`: dominio, cómo funciona, requisitos, instalación (Windows y macOS/Linux), ejecución, system prompt completo con la tabla del porqué, ejemplos, decisiones técnicas y limitaciones. En inglés.
+- `README.md`: dominio, cómo funciona, requisitos, instalación (Windows y macOS/Linux), ejecución, system prompt completo con su porqué, ejemplos, decisiones técnicas y limitaciones. En inglés.
 - `guion_demo.md`: guion de la presentación para Rubén, en español. No se sube a git.
 - `.claude/`: documentación de trabajo con Claude.
 - `white_castle_rag.ipynb`: el notebook único, con las salidas guardadas. Secciones:
@@ -36,7 +36,7 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
     - 1.3, base vectorial → `vector_store`, colección `white_castle_rules` con ids `chunk_000`….
     - 1.4, comprobación de la recuperación: `RETRIEVAL_K = 5` y `TEST_QUESTIONS = DIRECT_QUESTIONS + HARD_QUESTIONS` (7 + 5, con la página esperada), con una tabla y una celda de conclusiones.
   - 2, agente con memoria:
-    - 2.1, `SYSTEM_PROMPT` y la tabla con el porqué de cada regla.
+    - 2.1, `SYSTEM_PROMPT` y su porqué en dos puntos (rol y tono; qué responde y con qué).
     - 2.2, memoria: `REWRITE_PROMPT`, `TOPIC_CHANGE_NOTE` y `FOLLOW_UP_NOTE`.
     - 2.3, `AgentState` (`messages`, `question_kind`, `search_query`, `chunks`), `Rewrite` (salida estructurada del reescritor, en `rewriter`), nodos `rewrite`, `retrieve` y `generate` → grafo `agent` con `InMemorySaver`; `chat(question, thread_id)` muestra la respuesta, cómo se buscó y las páginas.
   - 3, ejemplos y chat:

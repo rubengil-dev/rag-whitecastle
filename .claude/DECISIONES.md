@@ -108,7 +108,7 @@
 ## Agente
 
 ### ¿Cómo es el system prompt?
-- **Decisión:** el contenido lo define Rubén y Claude lo ordena. Está escrito en inglés y responde siempre en español. Solo responde con los trozos recuperados. Primero decide el tipo de pregunta (regla con respuesta, pregunta que no se entiende sola, regla sin respuesta, aprender a jugar, fuera de tema) y aplica el formato de ese tipo. Si no encuentra la regla, empieza con "No encuentro esta regla en el manual" y propone una regla de la casa, sin citar página. Fuera de tema, responde con una frase fija. El porqué de cada regla está en la tabla de la sección 2.1 del notebook y en el README.
+- **Decisión:** el contenido lo define Rubén y Claude lo ordena. Está escrito en inglés y responde siempre en español. Solo responde con los trozos recuperados. Primero decide el tipo de pregunta (regla con respuesta, pregunta que no se entiende sola, regla sin respuesta, aprender a jugar, fuera de tema) y aplica el formato de ese tipo. Si no encuentra la regla, empieza con "No encuentro esta regla en el manual" y propone una regla de la casa, sin citar página. Fuera de tema, responde con una frase fija. Su porqué se explica en dos puntos (rol y tono; qué responde y con qué), igual en la sección 2.1 del notebook y en el README, sin tabla regla a regla, que quedaba como un registro de parches (decisión de Rubén).
 - **Por qué:** los modelos siguen mejor las instrucciones en inglés, pero la demo es en español. El agente no puede distinguir un hueco del manual de una búsqueda fallida, así que la frase vale para los dos casos. El orden por tipos y la frase fija salieron de las pruebas: sin ellos, el modelo citaba páginas donde no tocaba.
 
 ### ¿Cómo se ajustó el prompt en la Fase 4?
@@ -139,7 +139,7 @@
 - **Por qué:** el enunciado pide 5 ejemplos documentados y uno que demuestre la memoria con "una pregunta que hace referencia a una respuesta anterior"; la versión anterior lo demostraba con una respuesta del jugador a una aclaración, no con una pregunta. El chat va al final para que "Run All" no se quede esperando a mitad.
 
 ### ¿Qué se hace si un ejemplo documentado sale mal?
-- **Decisión:** se corrige (decisión de Rubén, que cambia la anterior de dejarlo como saliera). Si el fallo tiene una causa general (por ejemplo, una palabra del jugador que no está en el manual), se arregla esa causa; si es solo la variabilidad del modelo, se vuelve a ejecutar y las conclusiones dicen que esa pregunta varía (por confirmar).
+- **Decisión:** se corrige (decisión de Rubén, que cambia la anterior de dejarlo como saliera). Si el fallo tiene una causa general (por ejemplo, una palabra del jugador que no está en el manual), se arregla esa causa; si es solo la variabilidad del modelo, se vuelve a ejecutar y las conclusiones dicen que esa pregunta varía. Una respuesta incompleta pero no incorrecta se deja y se explica (la de los puntos del cortesano).
 - **Por qué:** los ejemplos de la 3.1 son lo único que ve el profesor del agente respondiendo; un fallo entre 7 respuestas pesa mucho más que entre las 30 de antes.
 
 ## Memoria

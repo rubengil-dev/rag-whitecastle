@@ -78,7 +78,7 @@ The settings live next to the explanation of their values: models and paths in s
 
 ## System prompt
 
-The prompt is written in English, because models follow instructions in English best, and it always answers in Spanish, like the rulebook and the players. Its core idea is that the agent first decides which kind of question it is facing, and each kind has its own format:
+The system prompt of the agent (section 2.1 of the notebook):
 
 ```text
 You are an expert on the rules of the board game White Castle. You help players during a game, so your answers are short and clear. Always answer in Spanish.
@@ -115,22 +115,11 @@ Never explain all the steps at once.
 Reply only with "Solo puedo ayudarte con las reglas de White Castle.", with no explanation and no page.
 ```
 
-Why each rule is there. Most of them come from a failure seen in the tests run while building the agent:
+These two points sum up the reasons behind it:
+- **Role and tone:** an expert on the rules of White Castle who helps players in the middle of a game. They need to settle a doubt and keep playing, so the answers are short: the answer first, then a short paragraph with the reason, then the page where they can check it. It always answers in Spanish, like the rulebook and its players; the prompt itself is in English, which models follow best.
+- **What it answers, and with what:** only questions about White Castle, and only with the rulebook excerpts retrieved for each question, never with what the model believes about the game, which may be wrong. When the excerpts do not have the answer, it says "No encuentro esta regla en el manual" and offers a house rule, labelled as unofficial, so the game can go on: with only a few chunks it cannot tell a gap in the rulebook from a failed search, and the sentence is honest about both. Anything outside White Castle gets a fixed reply.
 
-| Rule | Why |
-|---|---|
-| Expert, short answers | Players ask in the middle of a game: they need the answer, not an essay |
-| Spanish answers, English prompt | The rulebook and the players are Spanish; models follow instructions in English best |
-| Only the excerpts | Without it, the model fills the gaps with what it believes about the game, which may be wrong |
-| Kind of question first | Each kind of question has its own format. With all the rules in one list, the model added a page even to questions it could not answer |
-| Short answer → explanation → page | The first sentence settles the doubt at the table, the paragraph explains why, and the page lets the player check it |
-| "Sí" or "No" only for yes/no questions, parts not numbered | With the answer format as a numbered list, the model started open questions with "Sí", and in the "learning to play" mode it numbered the three parts instead of the steps. The question words ("qué", "cuánto"...) are named because a general rule was not enough |
-| Limits read literally | The model misread the limit of the courtier action ("las dos acciones una vez cada una") |
-| Deduce | Tricky answers are rarely written literally in the rulebook: they follow from the order of the steps |
-| Ask when the question cannot be understood on its own | Without it, a follow-up with no conversation behind it ("¿Y luego cómo lo subo?") made the model guess what it was about. Only in the first turn: otherwise it also asked when the earlier turns made the question clear |
-| "No encuentro esta regla en el manual" + house rule | With only a few chunks, the agent cannot tell a gap in the rulebook from a failed search: the sentence is honest about both. The house rule keeps the game going, labelled as unofficial |
-| One step at a time to learn the game | A whole explanation of the game is a wall of text, and the memory makes the step-by-step possible. The first answer is only the list: otherwise the model explained the first step without waiting |
-| Fixed reply outside White Castle | Keeps the agent in its role. Worded freely, the model still added a page |
+To apply both, the prompt first makes the model decide which kind of question it faces: a rules question, a question that cannot be understood on its own (it asks back instead of guessing), a rule the rulebook does not have, learning to play (one step at a time, waiting for the player) or something outside White Castle. Each kind has its own format. That idea came from the tests: with all the rules in one list, the model cited a page even when it could not answer. For rules questions, it also reads limits literally and deduces answers that follow from the order of the steps, because tricky rules are rarely written word for word.
 
 A second, smaller prompt (`REWRITE_PROMPT`, section 2.2) prepares follow-up questions for the search. It asks for the rulebook's words used in the conversation instead of the player's informal ones ("la sala del Daimio", not "arriba del todo"), and names points by the rulebook's term, "puntos de clan": with the player's words, the search missed the right page.
 
