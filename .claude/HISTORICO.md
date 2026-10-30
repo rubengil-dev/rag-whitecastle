@@ -3,6 +3,14 @@
 - **No contiene:** cifras, decisiones con su porqué ni el estado actual.
 - **Se actualiza:** al cerrar cada sesión, después del commit del trabajo.
 
+## 2026-10-30: Fase 6, chat web en Streamlit
+- Chat web en local (`app.py`) con el agente copiado del notebook, que no se toca: respuesta escrita según llega, aviso mientras busca, bienvenida, botón de nueva conversación en el menú lateral y errores de Gemini como aviso en el chat.
+- Estética japonesa con tema propio, sin imágenes del juego, y avatares SVG de campesino y robot.
+- Arreglado un `NoSessionContext` de Streamlit al crear el modelo desde un nodo de LangGraph.
+- README con la sección del chat web; instalación limpia de `requirements.txt` probada aparte. Rubén probó la celda del chat del notebook.
+- Trabajo en la rama `streamlit-app`, fusionada a `main`.
+- Commits: `b1f37a7` (Fase 6), `84d53d9` (`.claude/`).
+
 ## 2026-10-29: Revisión del notebook contra el enunciado
 - Quitadas las pruebas de desarrollo (2.3 y 3.3) y el agente sin memoria: queda un solo grafo con memoria y el modelo de chat se crea una vez en el setup. Lo que enseñaron las pruebas se cuenta junto a cada decisión.
 - Ejemplos nuevos en la 3.1: el seguimiento "¿Y cuántos puntos da?" demuestra la memoria, y la misma pregunta en una conversación nueva pide aclaración. Para que funcione: "puntos de clan" en el prompt de reescritura y una nota con la pregunta reescrita para `generate`.
