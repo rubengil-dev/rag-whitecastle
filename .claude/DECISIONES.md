@@ -23,6 +23,10 @@
 - **Decisión:** como un relato, no como una batería de pruebas: intro con el mapa de secciones; cada sección empieza con el porqué de lo que hace; cada prueba termina con una celda de conclusiones. Cada idea se cuenta una sola vez, donde se descubre, y el resto de sitios remiten a ella. Solo se quedan las pruebas que pide el enunciado: la comprobación de la recuperación (1.4) y los ejemplos (3.1). Las pruebas de desarrollo (el agente sin memoria y las conversaciones de memoria) se quitaron, y lo que enseñaron se cuenta junto a cada decisión, diciendo que viene de ellas. Las celdas de texto solo llevan decisiones con su porqué y contexto: nada que explique conceptos que el profesor ya conoce por su enunciado (qué es un RAG, un grafo de LangGraph, un embedding o un checkpointer) ni analogías.
 - **Por qué:** lo evalúa el profesor y se enseña en la demo; el porqué de cada decisión es parte de lo evaluado. Las pruebas de desarrollo repetían preguntas y alargaban la ejecución (unas 50 llamadas a Gemini en vez de unas 13). El porqué se queda en el notebook aunque también esté en el README, porque el notebook es lo que lee el profesor. Las explicaciones de conceptos eran para Rubén, no para el profesor (decisiones de Rubén).
 
+### ¿Cómo se conecta el chat web de Streamlit con el agente?
+- **Decisión:** `app.py` copia del notebook solo lo que el agente necesita para responder: configuración, prompts y grafo. Solo abre `chroma_db/`, sin transcribir, trocear ni indexar. El notebook no se toca (decisión de Rubén).
+- **Por qué:** Streamlit ejecuta un `.py` y un notebook no se importa como un módulo. Sacar el agente a un módulo compartido obligaba a cambiar el notebook entregado. Ejecutar sus celdas desde la app gastaría unas 13 llamadas a Gemini al arrancar y se quedaría esperando el `input()` del chat. El coste: un cambio en un prompt hay que copiarlo a mano a la app.
+
 ## Repo y datos
 
 ### ¿Repo público o privado?
@@ -167,6 +171,20 @@
 ### ¿Cómo se respeta el límite de llamadas del plan gratuito?
 - **Decisión:** el modelo de chat y el de la transcripción espacian sus llamadas con `InMemoryRateLimiter` a `CHAT_REQUESTS_PER_SECOND = 0.2` (12 por minuto).
 - **Por qué:** el plan gratuito de `gemini-3.5-flash-lite` permite 15 llamadas por minuto, y el notebook entero hace más de 30 seguidas: sin el limitador, la ejecución se cortaba con un error 429.
+
+## Chat web
+
+### ¿Se publica el chat web en Streamlit Cloud?
+- **Decisión:** no; solo se usa en local (decisión de Rubén).
+- **Por qué:** es para la demo. Publicarlo exigía guardar la key como secreto en Streamlit Cloud y subir la base vectorial al repo, y cada visita gastaría cupo de Gemini.
+
+### ¿Cómo es la interfaz?
+- **Decisión:** la barra de preguntas de Streamlit abajo y el menú lateral de Streamlit con el botón "Nueva conversación". Mensaje de bienvenida, aviso "Consultando el manual…" hasta la primera palabra y respuesta escrita según llega. Debajo de cada respuesta, cómo se buscó y las páginas, como en el notebook. Si Gemini falla, un aviso en el chat en vez de romperse la página.
+- **Por qué:** el menú lateral viene hecho, y un botón pegado a la barra necesitaba un truco frágil; a Rubén no le importa dónde esté. Sin el aviso, la espera del limitador parece un cuelgue, y en una demo en vivo un error no puede romper la página.
+
+### ¿Qué estética tiene?
+- **Decisión:** japonesa, como el juego: papel *washi*, rojo bermellón, tinta, olas *seigaiha* y títulos en Shippori Mincho, con el tema claro fijo. Avatares propios en SVG: un campesino con sombrero de paja para el jugador y un robot para el asistente (idea de Rubén).
+- **Por qué:** sin imágenes del juego, porque tienen derechos y el repo es público. Los emoji del castillo y la carta *hanafuda* no convencían a Rubén, y el robot deja claro quién responde. Con el tema claro fijo, la app se ve igual aunque el ordenador esté en modo oscuro.
 
 ## Método
 

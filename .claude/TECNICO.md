@@ -20,11 +20,16 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 - Crear el entorno virtual (una sola vez): `py -3.11 -m venv .venv`
 - Instalar las dependencias: `.\.venv\Scripts\python -m pip install -r requirements.txt`
 - Abrir el notebook: en VS Code, abrir el `.ipynb` → "Select Kernel" → `.venv (Python 3.11.9)`.
+- Arrancar el chat web: `.\.venv\Scripts\streamlit run app.py` → se abre en http://localhost:8501. La primera vez, Streamlit puede pedir un email en la terminal: Enter para saltarlo. Ctrl+C la para. Necesita `chroma_db/` creada antes por el notebook.
+- Claude prueba el chat web arrancándolo con `--server.headless true` (sin abrir navegador ni pedir email) y abriéndolo en su navegador.
 - Claude ejecuta el notebook con `nbclient` desde un entorno aparte, en su carpeta temporal, con un kernelspec propio que apunta al `python` del `.venv`. `nbclient` no está en `requirements.txt`. Se salta siempre la celda del chat (3.2), que esperaría un `input()`.
 
 ## Estructura
 - `.gitignore`: deja fuera `.env`, `.venv/`, cachés de Python y Jupyter, `enunciado.pdf`, `data/white_castle.pdf`, `data/transcript/`, `chroma_db/` y `guion_demo.md`.
-- `README.md`: dominio, cómo funciona, requisitos, instalación (Windows y macOS/Linux), ejecución, system prompt completo con su porqué, ejemplos, decisiones técnicas y limitaciones. En inglés.
+- `README.md`: dominio, cómo funciona, requisitos, instalación (Windows y macOS/Linux), ejecución, chat web opcional, system prompt completo con su porqué, ejemplos, decisiones técnicas y limitaciones. En inglés.
+- `app.py`: chat web en Streamlit con el agente del notebook. Arriba, las constantes: rutas, modelos, prompts copiados del notebook (idénticos), textos de la interfaz y estilo de la página (`PAGE_STYLE`, `HEADER_HTML`). Después, la página: `main()` → `check_setup` → `start_session` → `show_sidebar` → `show_conversation` → `answer_question`, que escribe la respuesta según llega (`stream_answer` con `stream_mode="messages"`, solo los trozos del nodo `generate`) y la guarda en `st.session_state.messages`. Abajo, el agente copiado; el modelo, el reescritor, la base y el grafo salen de funciones con `st.cache_resource` (`get_llm`, `get_rewriter`, `get_vector_store`, `get_agent`), así que se crean una vez y los comparten todas las conversaciones. Una conversación por pestaña del navegador, con un `thread_id` aleatorio.
+- `.streamlit/config.toml`: tema del chat web (colores, fuentes de Google Fonts, tema claro fijo), barra de herramientas mínima y sin estadísticas de uso.
+- `assets/`: avatares SVG del chat web, `farmer.svg` (jugador) y `robot.svg` (asistente).
 - `guion_demo.md`: guion de la presentación para Rubén, en español. No se sube a git.
 - `.claude/`: documentación de trabajo con Claude.
 - `white_castle_rag.ipynb`: el notebook único, con las salidas guardadas. Secciones:
@@ -58,5 +63,7 @@ En la terminal de VS Code (PowerShell), desde la carpeta del proyecto.
 - `gemini-3.5-flash-lite` ignora `temperature` (avisa con un `UserWarning`): no se le pasa. Por eso la misma pregunta puede dar respuestas distintas en cada ejecución.
 - El plan gratuito de `gemini-3.5-flash-lite` permite 15 llamadas por minuto; al pasarse, devuelve `429 RESOURCE_EXHAUSTED`. El modelo de chat lleva un limitador a 12 por minuto (`CHAT_REQUESTS_PER_SECOND`), así que el notebook entero tarda unos minutos.
 - `gemini-3.8-flash` puede devolver `503 UNAVAILABLE` cuando Google lo tiene saturado, y entonces cada llamada tarda minutos en reintentos. Su plan gratuito permite 20 llamadas al día por modelo (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`).
+- En `app.py`, las funciones con `st.cache_resource` llevan `show_spinner=False`: LangGraph ejecuta los nodos en otros hilos, sin acceso a la página, y el spinner de carga daba `NoSessionContext` la primera vez que un nodo creaba el modelo.
+- Gemini manda la respuesta en trozos de una frase más o menos; `st.write_stream` los escribe con efecto de máquina de escribir.
 - `agent.get_graph().draw_mermaid_png()` envía el grafo a mermaid.ink, un servicio externo: no se usa.
 - En la transcripción, algunas descripciones de iconos son aproximadas, hay sumas con formato de fórmula (`$10+10+3+1+1$`), las viñetas salen como `[Icono: Flecha roja]` y los niveles de título (`#`, `##`) no son del todo coherentes entre páginas. La limpieza quita lo repetido; quedan erratas sueltas (p. ej. "si seis 2/3/4 jugadores" en la p. 2) e iconos dentro de algunos títulos de sección.

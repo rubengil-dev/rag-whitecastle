@@ -87,5 +87,5 @@ def print_summary(jobs, failed):
 - Cada complicación tiene que responder a un problema real. Si no, fuera.
 
 ## Matices de este proyecto
-- Todo el código vive en el notebook: no se importa nada de archivos `.py` propios.
-- Celdas Markdown del notebook y README en inglés, como el código y los comentarios.
+- Todo el código del RAG vive en el notebook: no se importa nada de archivos `.py` propios. La única excepción es el chat web (`app.py`), que copia del notebook lo que necesita en vez de importarlo.
+- Celdas Markdown del notebook y README en inglés, como el código y los comentarios. Los textos que ve el usuario en el chat web, en español.

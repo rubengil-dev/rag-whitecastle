@@ -4,15 +4,14 @@
 - **Se actualiza:** al cerrar cada sesión.
 
 ## Próxima sesión
-1. Fase 6 (Streamlit): un front para hacer en Streamlit las preguntas del chat en directo de la demo, en vez de en la celda del notebook, que se ve peor. Hablarla antes de tocar nada.
-2. Entrega: Rubén envía el PDF del manual al profesor y prepara la presentación con `guion_demo.md`. Si se hace la Fase 6, la parte del chat en directo del guion cambia.
+1. Entrega, la hace Rubén: enviar el PDF del manual al profesor, adaptar `guion_demo.md` para hacer el chat en directo en la app de Streamlit y grabar la presentación. No queda código pendiente.
 
 ## Entregas
 Domingo 2026-11-01:
-- [ ] Notebook funcional (`.ipynb`): base vectorial con ChromaDB y embeddings de Gemini, agente LangGraph con RAG y memoria, celda de chat con al menos 5 ejemplos documentados.
-- [ ] README: descripción del dominio, instalación y ejecución, justificación del system prompt, requisitos (dependencias, API key de Gemini).
+- [x] Notebook funcional (`.ipynb`): base vectorial con ChromaDB y embeddings de Gemini, agente LangGraph con RAG y memoria, celda de chat con al menos 5 ejemplos documentados.
+- [x] README: descripción del dominio, instalación y ejecución, justificación del system prompt, requisitos (dependencias, API key de Gemini).
 - [ ] Presentación oral de 5-10 minutos con demo en vivo.
-- [ ] (Opcional) URL pública de la app en Streamlit Cloud.
+- (Opcional) URL pública de la app en Streamlit Cloud: no se hace, la app es solo local (ver `DECISIONES.md`).
 
 ## Fases
 - [x] **Fase 0, arranque:** `.gitignore`, entorno y esqueleto mínimo que arranca.
@@ -21,7 +20,7 @@ Domingo 2026-11-01:
 - [x] **Fase 3, memoria:** el agente recuerda los turnos anteriores y reescribe las preguntas de seguimiento antes de buscar, con un ejemplo en el notebook que lo demuestra.
 - [x] **Fase 4, chat y pruebas:** celda de chat y al menos 5 preguntas de ejemplo documentadas; ajustar el prompt según lo que falle y probar `gemini-3.8-flash` para la demo.
 - [x] **Fase 5, entrega:** revisión del programa entero de arriba abajo contra el enunciado (`enunciado.pdf`, que hay que releer) y los ajustes que salgan; después, README completo, notebook limpio que corre de arriba abajo y guion de la demo.
-- [ ] **Fase 6, bonus (condicional):** Streamlit, solo si sobra tiempo tras la Fase 5. Ver "Fuera de la primera versión" de `CONTEXTO.md`.
+- [x] **Fase 6, bonus:** chat web en Streamlit, en local, para el chat en directo de la demo, sin tocar el notebook.
 
 ## Pendiente para más adelante
 
@@ -35,6 +34,7 @@ Ninguna.
 ### Mejoras futuras
 - Bucle de reintentos (*corrective RAG*): un nodo juez decide si los trozos bastan para responder y, si no, se vuelve a buscar trozos distintos, hasta 3 veces. No hizo falta en la Fase 4: en los fallos vistos, la página buena estaba entre los trozos recuperados.
 - Mismo tema o tema nuevo: la clasificación falla a menudo, aunque no hace daño (ver `DECISIONES.md`). Solo se toca si empieza a hacerlo.
+- Publicar el chat web en Streamlit Cloud.
 
 ### Pendiente de probar yo
-- La celda del chat (3.2) en VS Code: que salga la caja de `input()`, que las respuestas se lean bien y que funcionen `nueva` y `salir`.
+Nada.

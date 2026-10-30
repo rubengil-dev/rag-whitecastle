@@ -19,11 +19,13 @@ Un asistente experto en las reglas del juego de mesa White Castle: responde preg
 
 ## Experiencia de usuario
 - Celda de chat dentro de un notebook, en VS Code en local.
+- Para el chat en directo de la demo, además, un chat web en el navegador, en local, que se ve mejor que la celda.
 - Lo usamos nosotros y el profesor al corregir; se enseña en una demo en vivo de 5-10 minutos.
 - El notebook incluye al menos 5 preguntas de ejemplo con sus respuestas, y una que demuestra la memoria.
 
 ### Diseño visual
-No aplica en la primera versión: es un notebook.
+- El notebook no tiene diseño propio.
+- El chat web tiene estética japonesa, como el juego: papel *washi*, rojo bermellón y olas *seigaiha*, con un campesino con sombrero de paja como avatar del jugador y un robot como el del asistente. Sin imágenes del juego.
 
 ## Cómo se construye
 1. Leer el manual y limpiar el texto.
@@ -32,6 +34,7 @@ No aplica en la primera versión: es un notebook.
 4. Grafo del agente: recibe la pregunta → recupera los trozos relevantes → genera la respuesta con Gemini.
 5. Memoria de conversación sobre ese grafo.
 6. Celda de chat para conversar con él.
+7. Chat web en local con el mismo agente, para la demo.
 
 ## Restricciones
 - Coste cero: modelo gratuito de Gemini.
@@ -40,4 +43,4 @@ No aplica en la primera versión: es un notebook.
 - El manual y las respuestas, en español.
 
 ## Fuera de la primera versión
-- Interfaz web en Streamlit y despliegue público en Streamlit Cloud: se hace solo si el RAG funciona y sobra tiempo, porque es bonus y lo evaluado es el RAG.
+- Despliegue público del chat web en Streamlit Cloud: es bonus y lo evaluado es el RAG.
