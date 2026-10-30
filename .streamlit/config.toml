@@ -1,0 +1,22 @@
+# Streamlit settings for app.py: Japanese-style light theme, no usage stats, minimal toolbar
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base                     = "light"
+primaryColor             = "#B23A2E"  # vermilion, like a torii gate
+backgroundColor          = "#F6F0E1"  # washi paper
+secondaryBackgroundColor = "#ECE2CB"
+textColor                = "#2B2522"  # sumi ink
+borderColor              = "#D9CBAE"
+linkColor                = "#B23A2E"
+baseRadius               = "0.4rem"
+font        = "Zen Kaku Gothic New:https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap, sans-serif"
+headingFont = "Shippori Mincho:https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&display=swap, serif"
+
+[theme.sidebar]
+backgroundColor = "#EAE0C8"

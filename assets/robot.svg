@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Assistant avatar: robot in the colours of the theme -->
+  <line x1="32" y1="7" x2="32" y2="15" stroke="#2B2522" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="32" cy="6" r="3.5" fill="#B23A2E"/>
+  <path d="M12 64 C12 54 20 49 32 49 C44 49 52 54 52 64 Z" fill="#2B2522"/>
+  <circle cx="32" cy="57" r="3" fill="#B23A2E"/>
+  <rect x="28" y="43" width="8" height="7" fill="#7A6A58"/>
+  <rect x="7" y="24" width="6" height="13" rx="2" fill="#B23A2E"/>
+  <rect x="51" y="24" width="6" height="13" rx="2" fill="#B23A2E"/>
+  <rect x="12" y="15" width="40" height="30" rx="8" fill="#ECE2CB" stroke="#2B2522" stroke-width="2.5"/>
+  <rect x="18" y="21" width="28" height="13" rx="6.5" fill="#2B2522"/>
+  <circle cx="25" cy="27.5" r="3" fill="#F6F0E1"/>
+  <circle cx="39" cy="27.5" r="3" fill="#F6F0E1"/>
+  <path d="M25 39 h14" stroke="#2B2522" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

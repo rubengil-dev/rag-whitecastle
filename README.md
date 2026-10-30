@@ -2,7 +2,7 @@
 
 An assistant that answers questions about the rules of the board game **White Castle**, in Spanish, during a game. It uses RAG (retrieval-augmented generation): before answering, it looks up the relevant passages of the official rulebook in a vector store and answers only from them, citing the page. It remembers the conversation, so follow-up questions such as "¿Y luego cómo lo subo?" work.
 
-Final project of the Generative AI module (Evolve data science master). Everything runs in a single notebook: [`white_castle_rag.ipynb`](white_castle_rag.ipynb).
+Final project of the Generative AI module (Evolve data science master). Everything runs in a single notebook: [`white_castle_rag.ipynb`](white_castle_rag.ipynb). As an extra, [`app.py`](app.py) opens the same agent as a web chat in the browser (see [Optional: web chat](#optional-web-chat-streamlit)).
 
 ## The domain
 
@@ -38,7 +38,7 @@ Under every answer, the notebook shows how the question was searched and the pag
 ## Requirements
 
 - **Python 3.11** (tested with 3.11.9) and Jupyter, for example VS Code with the Jupyter extension.
-- **Dependencies:** listed with fixed versions in [`requirements.txt`](requirements.txt): LangChain, LangGraph, ChromaDB, the Gemini integration (`langchain-google-genai`), `pypdf` and `python-dotenv`.
+- **Dependencies:** listed with fixed versions in [`requirements.txt`](requirements.txt): LangChain, LangGraph, ChromaDB, the Gemini integration (`langchain-google-genai`), `pypdf` and `python-dotenv`, plus Streamlit for the optional web chat.
 - **A Gemini API key**, free tier. Both models used are free.
 - **The rulebook PDF.** It is not in the repository, because it is not clear that it can be shared publicly. It is sent separately and goes in `data/white_castle.pdf`.
 
@@ -75,6 +75,33 @@ Open `white_castle_rag.ipynb`, select the `.venv` kernel and run all the cells, 
 - **Chat:** the last cell opens a text box (in VS Code, at the top of the window) to talk to the agent. `nueva` starts a new conversation with no memory of the earlier one, and `salir` or an empty line ends the chat.
 
 The settings live next to the explanation of their values: models and paths in section 0, chunking in 1.2, number of retrieved chunks in 1.4. To rebuild the vector store after changing the cleaning or the chunking, set `REBUILD_VECTOR_STORE = True` once (section 1.3).
+
+## Optional: web chat (Streamlit)
+
+[`app.py`](app.py) is a small web page, running on your own computer, to chat with the same agent in the browser. It is used for the live part of the demo, because it reads better than the notebook's text box. It is an extra: everything that is evaluated is in the notebook.
+
+1. Run the notebook at least once first: the app loads the vector store from `chroma_db/` and does not build it. If it is missing, or the `.env` file is, the page says so.
+2. Start it from the project folder:
+
+   Windows (PowerShell):
+   ```powershell
+   .\.venv\Scripts\streamlit run app.py
+   ```
+
+   macOS / Linux:
+   ```bash
+   .venv/bin/streamlit run app.py
+   ```
+
+   It opens in the browser at http://localhost:8501. The first time, Streamlit may ask for an email in the terminal: press Enter to skip it. To stop it, press Ctrl+C in the terminal.
+
+What it does:
+- **Answers written as they arrive:** "Consultando el manual…" is shown until Gemini starts answering, and then the answer appears word by word. Under each answer, the same as in the notebook: how the question was searched and the pages of the retrieved chunks.
+- **New conversation:** the sidebar (the arrow at the top left) has a "Nueva conversación" button, like `nueva` in the notebook's chat.
+- **Friendly errors:** if Gemini is busy (`429` or `503`), a message in the chat asks to wait a moment instead of breaking the page. The full error is printed in the terminal.
+- **Japanese-style theme,** like the game: washi paper, vermilion and seigaiha waves, with a rice farmer as the player's avatar and a robot as the assistant's, and no images from the game. The colours and fonts are in [`.streamlit/config.toml`](.streamlit/config.toml), the rest in the page style of `app.py`.
+
+**Why `app.py` copies the agent instead of importing it:** Streamlit runs a `.py` file, and a notebook cannot be imported as a module. Moving the agent to a shared module would have changed the notebook, which is the deliverable, so `app.py` copies only what the agent needs to answer (settings, prompts and graph) and leaves out the transcription, the chunking and the tests. The prompts are the same as in the notebook: a change in one has to be copied to the other.
 
 ## System prompt
 
@@ -148,6 +175,9 @@ The agent was tuned with more tests: harder questions that need several rules at
 
 ```
 white_castle_rag.ipynb   the notebook, with the outputs of its last run
+app.py                   optional web chat with the same agent (Streamlit)
+.streamlit/config.toml   theme of the web chat
+assets/                  avatars of the web chat
 requirements.txt         dependencies with fixed versions
 data/                    the rulebook PDF and its transcription (not in the repository)
 chroma_db/               the local vector store (not in the repository, built on the first run)

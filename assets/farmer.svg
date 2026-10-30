@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Player avatar: rice farmer with a conical straw hat -->
+  <path d="M12 64 C12 51 21 45 32 45 C43 45 52 51 52 64 Z" fill="#3A4E6B"/>
+  <circle cx="32" cy="36" r="9.5" fill="#E6C29A"/>
+  <ellipse cx="32" cy="32.5" rx="9" ry="2.2" fill="#C9A27C"/>
+  <path d="M24.5 36.5 q2 1.6 4 0 M35.5 36.5 q2 1.6 4 0" stroke="#2B2522" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M29 41 q3 2 6 0" stroke="#B23A2E" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <polygon points="3,31 32,7 61,31" fill="#D9B26A" stroke="#9C7A3C" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M32 7 L9 30 M32 7 L19 31 M32 7 L32 31 M32 7 L45 31 M32 7 L55 30" stroke="#B8914A" stroke-width="1"/>
+  <ellipse cx="32" cy="31" rx="29" ry="2.6" fill="#B8914A"/>
+</svg>
